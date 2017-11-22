@@ -3,7 +3,6 @@ pragma solidity ^0.4.4;
 import "./math/SafeMath.sol";
 import "./token/StandardToken.sol";
 import "./ownership/Ownable.sol";
-import "./lib/UniqueAddressSet.sol";
 
 contract CREDToken is StandardToken, Ownable
 {
@@ -67,14 +66,40 @@ contract CREDToken is StandardToken, Ownable
 	return strConcat(_a, _b, "", "", "");
     }
     
+    struct UniqueAddressSet
+    {
+	mapping (address => uint16) addxIndex;
+	mapping (uint16 => address) addxs;
+	uint16 size;
+    }
+    
     UniqueAddressSet public whitelistAddresses;
     UniqueAddressSet public advisorsAddresses;
     mapping (address => bool) public isAddressVerified;
 
+    event AddressAddedToWhiteList(address sender, uint16 index, address addx);
+    function _AddAddressToWL(address addx) internal
+    {
+            whitelistAddresses.addxs[whitelistAddresses.size] = addx;
+            whitelistAddresses.addxIndex[addx] = whitelistAddresses.size;
+            AddressAddedToWhiteList(msg.sender, whitelistAddresses.size, addx);
+            ++whitelistAddresses.size;
+            
+    }
+
+    function _AddAddressToAdv(address addx) internal
+    {
+            advisorsAddresses.addxs[advisorsAddresses.size] = addx;
+            advisorsAddresses.addxIndex[addx] = advisorsAddresses.size;
+            ++advisorsAddresses.size;
+    }
+
+
+
+    
+
     function CREDToken()
     {
-	whitelistAddresses = new UniqueAddressSet();
-	advisorsAddresses = new UniqueAddressSet();
     }
     
     function setAddressVerifyed(address addx) onlyOwner returns(bool)
@@ -83,22 +108,30 @@ contract CREDToken is StandardToken, Ownable
     }
     
     event AddToWhitelist(address sender, uint16 index, address addx);
-
+    event AddressAlreadyInList(address sender, string message, string listname);
     function AddAdressesToWhitelist(address[] addxs)
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
 	{
 	    AddToWhitelist(msg.sender, i, addxs[i]);
-	    whitelistAddresses.addElement(addxs[i]);
+	    if (whitelistAddresses.size == 0) _AddAddressToWL(addxs[i]);
+    	    else {
+    		if (whitelistAddresses.addxIndex[addxs[i]] == 0 && whitelistAddresses.addxs[0] != addxs[i])
+    		{
+		    _AddAddressToWL(addxs[i]);
+    		}
+    		else AddressAlreadyInList(msg.sender, "Address already in ", "Whitelist");
+    	    }
+
 	}
     }
 
     event ListWhitelist(address sender, uint16 index, address addx);
     function ListWhitelistAddresses() onlyOwner
     {
-	for (uint16 i = 0; i < whitelistAddresses.getSize(); ++i)
+	for (uint16 i = 0; i < whitelistAddresses.size; ++i)
 	{
-	    ListWhitelist(msg.sender, i, whitelistAddresses.getElement(i));
+	    ListWhitelist(msg.sender, i, whitelistAddresses.addxs[i]);
 	}
     }
 
