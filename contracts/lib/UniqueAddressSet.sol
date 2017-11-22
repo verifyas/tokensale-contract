@@ -3,31 +3,58 @@ pragma solidity ^0.4.4;
 contract UniqueAddressSet
 {
     event SetOutOfRange(address addx, string message, uint elementIndex);
+    event UniqueAddressSetDebug(address addx, string functionName, string message);
 
     mapping (uint => address) addxs;
     mapping (address => uint) addxIndex;
-    uint public size = 0;
-    
+    uint public size;
+
     function UniqueAddressSet()
     {
-
+	UniqueAddressSetDebug(msg.sender, "Constructor", "Reached");
+	size = 0;
     }
     
     function _addElement(address addx) internal
     {
-	addxs[size] = addx;
-	addxIndex[addx] = size;
-	++size;
+	if (size == 0)
+	{
+	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached");
+	    addxs[size] = addx;
+	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached2");
+	    addxIndex[addx] = size;
+	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached3");
+	    ++size;
+	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached4");
+	}
+	else
+	{
+	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached5");
+	    addxs[size] = addx;
+	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached6");
+//	    addxIndex[addx] = size;
+//	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached7");
+//	    ++size;
+//	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached8");
+
+	}
+	
     }
 
     function addElement(address addx)
     {
+	UniqueAddressSetDebug(msg.sender, "Add Element", "Reached, line 27");
 	if (size == 0) _addElement(addx);
-	else if (addxIndex[addx] == 0) _addElement(addx);
+	else if (addxIndex[addx] == 0)
+	{
+		UniqueAddressSetDebug(msg.sender, "Add Element", "Reached, line 36");
+	        _addElement(addx);
+	}
     }
     
     function getElement(uint elementIndex) returns (address)
     {
+    	UniqueAddressSetDebug(msg.sender, "getElement", "Reached");
 	if (elementIndex >= size) 
 	{
 	    SetOutOfRange(msg.sender, "Set Out of range", elementIndex);
@@ -36,9 +63,16 @@ contract UniqueAddressSet
 	else return addxs[elementIndex];
     }
 
+    event Empty(address sender, string debug, string message);
+    function empty()
+    {
+	Empty(msg.sender, "Method Empty", "Reached");
+    }
+
     function getSize() returns (uint)
     {
+    	UniqueAddressSetDebug(msg.sender, "getSize", "Reached");
 	return size;
     }
-    
+
 }
