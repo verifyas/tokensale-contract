@@ -65,16 +65,18 @@ contract CREDToken is StandardToken, Ownable
     function strConcat(string _a, string _b) internal returns (string) {
 	return strConcat(_a, _b, "", "", "");
     }
-    
+
     struct UniqueAddressSet
     {
 	mapping (address => uint16) addxIndex;
 	mapping (uint16 => address) addxs;
 	uint16 size;
     }
-    
+
     UniqueAddressSet public whitelistAddresses;
     UniqueAddressSet public advisorsAddresses;
+    UniqueAddressSet public teamAddresses;
+
     mapping (address => bool) public isAddressVerified;
 
     event AddressAddedToWhiteList(address sender, uint16 index, address addx);
@@ -87,16 +89,19 @@ contract CREDToken is StandardToken, Ownable
             
     }
 
-    function _AddAddressToAdv(address addx) internal
+    function _AddAddressToAL(address addx) internal
     {
             advisorsAddresses.addxs[advisorsAddresses.size] = addx;
             advisorsAddresses.addxIndex[addx] = advisorsAddresses.size;
             ++advisorsAddresses.size;
     }
 
-
-
-    
+    function _AddAddressToTL(address addx) internal
+    {
+            teamAddresses.addxs[teamAddresses.size] = addx;
+            teamAddresses.addxIndex[addx] = teamAddresses.size;
+            ++teamAddresses.size;
+    }
 
     function CREDToken()
     {
@@ -107,20 +112,63 @@ contract CREDToken is StandardToken, Ownable
 	isAddressVerified[addx] = true;
     }
     
-    event AddToWhitelist(address sender, uint16 index, address addx);
+    event AddTolist(address addx, string listname, uint16 index);
     event AddressAlreadyInList(address sender, string message, string listname);
-    function AddAdressesToWhitelist(address[] addxs)
+    function AddAdressesToWhitelist(address[] addxs) onlyOwner
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
 	{
-	    AddToWhitelist(msg.sender, i, addxs[i]);
-	    if (whitelistAddresses.size == 0) _AddAddressToWL(addxs[i]);
+	    AddTolist(addxs[i], "Whitelist", i);
+	    if (whitelistAddresses.size == 0)
+	    {
+		_AddAddressToWL(addxs[i]);
+	    }
     	    else {
     		if (whitelistAddresses.addxIndex[addxs[i]] == 0 && whitelistAddresses.addxs[0] != addxs[i])
     		{
 		    _AddAddressToWL(addxs[i]);
     		}
     		else AddressAlreadyInList(msg.sender, "Address already in ", "Whitelist");
+    	    }
+
+	}
+    }
+
+    function AddAdressesToAdvisorslist(address[] addxs) onlyOwner
+    {
+	for (uint16 i = 0; i < addxs.length; ++i)
+	{
+	    AddTolist(addxs[i], "Advisors", i);
+	    if (advisorsAddresses.size == 0)
+	    {
+		_AddAddressToAL(addxs[i]);
+	    }
+    	    else {
+    		if (advisorsAddresses.addxIndex[addxs[i]] == 0 && advisorsAddresses.addxs[0] != addxs[i])
+    		{
+		    _AddAddressToAL(addxs[i]);
+    		}
+    		else AddressAlreadyInList(msg.sender, "Address already in ", "Advisors list");
+    	    }
+
+	}
+    }
+
+    function AddAdressesToTeamlist(address[] addxs) onlyOwner
+    {
+	for (uint16 i = 0; i < addxs.length; ++i)
+	{
+	    AddTolist(addxs[i], "Team", i);
+	    if (teamAddresses.size == 0)
+	    {
+		_AddAddressToTL(addxs[i]);
+	    }
+    	    else {
+    		if (teamAddresses.addxIndex[addxs[i]] == 0 && teamAddresses.addxs[0] != addxs[i])
+    		{
+		    _AddAddressToTL(addxs[i]);
+    		}
+    		else AddressAlreadyInList(msg.sender, "Address already in ", "Team list");
     	    }
 
 	}
@@ -134,5 +182,24 @@ contract CREDToken is StandardToken, Ownable
 	    ListWhitelist(msg.sender, i, whitelistAddresses.addxs[i]);
 	}
     }
+
+    event ListAdvisors(address sender, uint16 index, address addx);
+    function ListAdvisorsAddresses() onlyOwner
+    {
+	for (uint16 i = 0; i < advisorsAddresses.size; ++i)
+	{
+	    ListWhitelist(msg.sender, i, advisorsAddresses.addxs[i]);
+	}
+    }
+
+    event ListTeam(address sender, uint16 index, address addx);
+    function ListTeamAddresses() onlyOwner
+    {
+	for (uint16 i = 0; i < teamAddresses.size; ++i)
+	{
+	    ListWhitelist(msg.sender, i, teamAddresses.addxs[i]);
+	}
+    }
+
 
 }
