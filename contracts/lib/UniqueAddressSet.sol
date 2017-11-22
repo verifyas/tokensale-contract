@@ -4,10 +4,11 @@ contract UniqueAddressSet
 {
     event SetOutOfRange(address addx, string message, uint elementIndex);
     event UniqueAddressSetDebug(address addx, string functionName, string message);
-
-    mapping (uint => address) addxs;
-    mapping (address => uint) addxIndex;
-    uint public size;
+    event Debug(address sender, address adx, uint sz );
+    
+    mapping (address => uint16) addxIndex;
+    mapping (uint16 => address) addxs;
+    uint16 public size;
 
     function UniqueAddressSet()
     {
@@ -32,10 +33,11 @@ contract UniqueAddressSet
 	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached5");
 	    addxs[size] = addx;
 	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached6");
-//	    addxIndex[addx] = size;
-//	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached7");
-//	    ++size;
-//	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached8");
+	    Debug(msg.sender, addx, size);
+	    addxIndex[addx] = 1;
+	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached7");
+	    ++size;
+	    UniqueAddressSetDebug(msg.sender, "_addElement", "Reached8");
 
 	}
 	
@@ -52,7 +54,7 @@ contract UniqueAddressSet
 	}
     }
     
-    function getElement(uint elementIndex) returns (address)
+    function getElement(uint16 elementIndex) returns (address)
     {
     	UniqueAddressSetDebug(msg.sender, "getElement", "Reached");
 	if (elementIndex >= size) 

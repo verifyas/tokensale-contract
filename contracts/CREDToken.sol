@@ -82,21 +82,21 @@ contract CREDToken is StandardToken, Ownable
 	isAddressVerified[addx] = true;
     }
     
-    event AddToWhitelist(address sender, uint index, address addx);
+    event AddToWhitelist(address sender, uint16 index, address addx);
 
     function AddAdressesToWhitelist(address[] addxs)
     {
-	for (uint i = 0; i < addxs.length; ++i)
+	for (uint16 i = 0; i < addxs.length; ++i)
 	{
 	    AddToWhitelist(msg.sender, i, addxs[i]);
 	    whitelistAddresses.addElement(addxs[i]);
 	}
     }
 
-    event ListWhitelist(address sender, uint index, address addx);
+    event ListWhitelist(address sender, uint16 index, address addx);
     function ListWhitelistAddresses() onlyOwner
     {
-	for (uint i = 0; i < whitelistAddresses.getSize(); ++i)
+	for (uint16 i = 0; i < whitelistAddresses.getSize(); ++i)
 	{
 	    ListWhitelist(msg.sender, i, whitelistAddresses.getElement(i));
 	}
