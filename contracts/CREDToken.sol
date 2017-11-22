@@ -8,64 +8,6 @@ contract CREDToken is StandardToken, Ownable
 {
     using SafeMath for uint256;
 
-    function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
-	bytes memory _ba = bytes(_a);
-        bytes memory _bb = bytes(_b);
-        bytes memory _bc = bytes(_c);
-	bytes memory _bd = bytes(_d);
-        bytes memory _be = bytes(_e);
-	string memory abcde = new string(_ba.length + _bb.length + _bc.length + _bd.length + _be.length);
-	bytes memory babcde = bytes(abcde);
-        uint k = 0;
-    
-        for (uint i = 0; i < _ba.length; i++) babcde[k++] = _ba[i];
-    
-        for (i = 0; i < _bb.length; i++) babcde[k++] = _bb[i];
-
-	for (i = 0; i < _bc.length; i++) babcde[k++] = _bc[i];
-
-        for (i = 0; i < _bd.length; i++) babcde[k++] = _bd[i];
-
-	for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
-
-        return string(babcde);
-    }
-    
-    function bytes32ToString (bytes32 data) internal returns (string) {
-    bytes memory bytesString = new bytes(32);
-    for (uint j=0; j<32; j++) {
-      byte char = byte(bytes32(uint(data) * 2 ** (8 * j)));
-      if (char != 0) {
-        bytesString[j] = char;
-      }
-    }
-
-    return string(bytesString);
-  }
-    
-    function uintToBytes32(uint256 x) internal returns (bytes32 b) {
-	assembly { mstore(add(b, 32), x) }
-    }
-
-    function uintToString(uint number) internal returns (string)
-    {
-	bytes32 bx32 = uintToBytes32(number);
-	return bytes32ToString(bx32);
-    }
-
-
-    function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
-	return strConcat(_a, _b, _c, _d, "");
-    }
-
-    function strConcat(string _a, string _b, string _c) internal returns (string) {
-	return strConcat(_a, _b, _c, "", "");
-    }
-
-    function strConcat(string _a, string _b) internal returns (string) {
-	return strConcat(_a, _b, "", "", "");
-    }
-
     struct UniqueAddressSet
     {
 	mapping (address => uint16) addxIndex;
@@ -78,6 +20,86 @@ contract CREDToken is StandardToken, Ownable
     UniqueAddressSet public teamAddresses;
 
     mapping (address => bool) public isAddressVerified;
+
+    uint256 rate;
+    uint256 cap;
+    address verifyWallet;
+    address verifyFundWallet;
+    uint256 public earlyInvestorsBalance;
+    uint256 public futureTokenSaleBalance;
+    uint256 public tokenSaleBalance;
+    uint256 public verifyTeamBalance;
+    uint256 public advisorsBalance;
+    uint256 public bountyBalance;
+    uint256 public weiRaised;
+
+    bool capReached;
+    
+    function CREDToken()
+    {
+	rate = 1333;
+
+	weiRaised = 0;
+	verifyWallet = 0xB4e817449b2fcDEc82e69f02454B42FE95D4d1fD;
+	verifyWallet = 0x7a56d49393c728B9607666e07fFf5E55F51d89f6; //privatenetWallet
+	verifyFundWallet = 0x028e27D09bb37FA00a1691fFE935D190C8D1668c;
+	verifyFundWallet = 0xC2651a4c61e55bFb8097A191eeeeD1C0c8F13b9a; //privatenetWallet
+
+	totalSupply =                50000000000000000000000000;
+	cap =                            1666000000000000000000;
+	
+	balances[verifyFundWallet] = 10500000000000000000000000;
+	balances[verifyWallet] =     39500000000000000000000000;
+
+	earlyInvestorsBalance =       2000000000000000000000000;
+	tokenSaleBalance =           11125000000000000000000000;
+	futureTokenSaleBalance =     10000000000000000000000000;
+	verifyTeamBalance =          10000000000000000000000000;
+	advisorsBalance =             5500000000000000000000000;
+	bountyBalance =                875000000000000000000000;
+
+    }
+
+    function () payable {
+	buyCREDTokens(msg.sender);
+    }
+
+    // @return true if the transaction can buy tokens
+    function validPurchase() internal constant returns (bool) {
+//	bool withinPeriod = now >= startTime && now <= endTime;
+	bool nonZeroPurchase = msg.value != 0;
+//	return withinPeriod && nonZeroPurchase;
+	return nonZeroPurchase;
+    }
+    event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
+
+    function buyCREDTokens(address beneficiary) public payable {
+	require(beneficiary != 0x0);
+	require(validPurchase());
+
+	uint256 weiAmount = msg.value;
+
+	// calculate token amount to be created
+	uint256 tokens = weiAmount.mul(rate);
+
+	// update state
+	weiRaised = weiRaised.add(weiAmount);
+	sellTokens(tokens);
+	tokenSaleBalance.sub(tokens);
+	TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
+
+	forwardFunds();
+    }
+
+    function forwardFunds() internal {
+	verifyWallet.transfer(msg.value);
+    }
+
+    function sellTokens(uint256 tokens) internal
+    {
+	balances[verifyWallet] = balances[verifyWallet] - tokens;
+	balances[msg.sender] = balances[msg.sender] + tokens;
+    }
 
     event AddressAddedToWhiteList(address sender, uint16 index, address addx);
     function _AddAddressToWL(address addx) internal
@@ -103,10 +125,6 @@ contract CREDToken is StandardToken, Ownable
             ++teamAddresses.size;
     }
 
-    function CREDToken()
-    {
-    }
-    
     function setAddressVerifyed(address addx) onlyOwner returns(bool)
     {
 	isAddressVerified[addx] = true;
