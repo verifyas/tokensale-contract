@@ -46,7 +46,7 @@ contract CREDToken is StandardToken, Ownable
     bool contractDeployed;
     bool capReached;
     
-    function setEarlyTokenSaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) onlyOwner
+    function setEarlyTokenSaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
     {
 	if (!contractDeployed)
 	{
@@ -54,7 +54,51 @@ contract CREDToken is StandardToken, Ownable
 	}
     }
     
+    function setTokensaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+    {
+	if (!contractDeployed)
+	{
+	    tokensaleStartTime = dtUtils.toTimestamp(year, month, day, hour, minute);
+	}
+    }
     
+        function setVerifyTeamLockTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+    {
+	if (!contractDeployed)
+	{
+	    verifyTeamLockTime = dtUtils.toTimestamp(year, month, day, hour, minute);
+	}
+    }
+    
+    function setAdvisorsLockTime1(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+    {
+	if (!contractDeployed)
+	{
+	    advisorsLockTime1 = dtUtils.toTimestamp(year, month, day, hour, minute);
+	}
+    }
+    
+    function setAdvisorsLockTime2(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+    {
+	if (!contractDeployed)
+	{
+	    advisorsLockTime2 = dtUtils.toTimestamp(year, month, day, hour, minute);
+	}
+    }
+
+    function setVerifyWallet(address vwAddress) onlyOwner public
+    {
+	if (!contractDeployed)
+	{
+	    verifyWallet = vwAddress;
+	}    
+    }
+    
+    function deployContract() public onlyOwner
+    {
+	contractDeployed = true;
+    }
+
     function CREDToken()
     {
 	rate = 1333;
@@ -88,9 +132,9 @@ contract CREDToken is StandardToken, Ownable
 	buyCREDTokens(msg.sender);
     }
 
-    function releaseFutureSale() onlyOwner()
+    function releaseFutureSale() onlyOwner public
     {
-//	if time
+//	if (now > )
 	balances[verifyWallet] = balances[verifyWallet] + tokenSaleBalance;
     
     }
@@ -104,26 +148,64 @@ contract CREDToken is StandardToken, Ownable
     }
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
+    event EarlyInvestorsBalanceReleased(address own, string message, uint256 TokensAdded);
+    event TokenSaleIsNotAllowed(address sender, string message, uint256 amount);
+    
     function buyCREDTokens(address beneficiary) public payable {
 	require(beneficiary != 0x0);
-	require(validPurchase());
+//	require(validPurchase());
 
-	uint256 weiAmount = msg.value;
+        uint256 weiAmount = msg.value;
+        // calculate token amount to be created
+        uint256 tokens = weiAmount.mul(rate);
 
-	// calculate token amount to be created
-	uint256 tokens = weiAmount.mul(rate);
+	if (now > tokensaleStartTime)
+	{
+	    if (earlyInvestorsBalance > 0)
+	    {
+		balances[verifyWallet] = balances[verifyWallet] + earlyInvestorsBalance;
+		EarlyInvestorsBalanceReleased(msg.sender, "Tokens Transferres to verifyWallet",  earlyInvestorsBalance);
+		earlyInvestorsBalance = 0;
 
-	// update state
-	weiRaised = weiRaised.add(weiAmount);
-	sellTokens(tokens);
-	tokenSaleBalance.sub(tokens);
-	TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
+	    }
+	    sellTokens(tokens);
+	    tokenSaleBalance.sub(tokens);
+	    TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
+	    forwardFunds();
+	    // update state
+            weiRaised = weiRaised.add(weiAmount);
 
-	forwardFunds();
+	}
+	else 
+/*	    if ((now > earlyTokensaleStartTime) && isInWhiteList(msg.sender))
+	    {
+		if ()
+		{
+		    balances[msg.sender] = balances[msg.sender] + tokens;
+		    earlyInvestorsBalance -= tokens;
+		    forwardFunds();
+
+		}
+	    }
+*/	    {
+		TokenSaleIsNotAllowed(msg.sender, "Refunded", msg.value);
+		refundBack(msg.value);
+	    }
+
+    }
+
+    function isInWhiteList(address addx) public onlyOwner returns (bool)
+    {
+	if (addx == whitelistAddresses.addxs[0]) return true;
+	else return (whitelistAddresses.addxIndex[addx] != 0);
     }
 
     function forwardFunds() internal {
 	verifyWallet.transfer(msg.value);
+    }
+
+    function refundBack(uint256 weis) internal {
+	msg.sender.transfer(weis);
     }
 
     function sellTokens(uint256 tokens) internal
@@ -156,7 +238,7 @@ contract CREDToken is StandardToken, Ownable
             ++teamAddresses.size;
     }
 
-    function setAddressVerifyed(address addx) onlyOwner returns(bool)
+    function setAddressVerifyed(address addx) onlyOwner public returns(bool)
     {
 	isAddressVerified[addx] = true;
     }
@@ -224,7 +306,7 @@ contract CREDToken is StandardToken, Ownable
     }
 
     event ListWhitelist(address sender, uint16 index, address addx);
-    function ListWhitelistAddresses() onlyOwner
+    function ListWhitelistAddresses() onlyOwner public
     {
 	for (uint16 i = 0; i < whitelistAddresses.size; ++i)
 	{
@@ -249,6 +331,5 @@ contract CREDToken is StandardToken, Ownable
 	    ListWhitelist(msg.sender, i, teamAddresses.addxs[i]);
 	}
     }
-
 
 }
