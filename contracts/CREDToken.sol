@@ -3,6 +3,7 @@ pragma solidity ^0.4.4;
 import "./math/SafeMath.sol";
 import "./token/StandardToken.sol";
 import "./ownership/Ownable.sol";
+import "./lib/DateTime.sol";
 
 contract CREDToken is StandardToken, Ownable
 {
@@ -29,16 +30,35 @@ contract CREDToken is StandardToken, Ownable
     uint256 public futureTokenSaleBalance;
     uint256 public tokenSaleBalance;
     uint256 public verifyTeamBalance;
+    uint256 public verifyTeamVested;
     uint256 public advisorsBalance;
     uint256 public bountyBalance;
     uint256 public weiRaised;
-
+    uint256 public advisorsVested;
+    DateTime public dtUtils;
+    
+    uint256 public earlyTokensaleStartTime;
+    uint256 public tokensaleStartTime;
+    uint256 public verifyTeamLockTime;
+    uint256 public advisorsLockTime1;
+    uint256 public advisorsLockTime2;
+    
+    bool contractDeployed;
     bool capReached;
+    
+    function setEarlyTokenSaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) onlyOwner
+    {
+	if (!contractDeployed)
+	{
+	    earlyTokensaleStartTime = dtUtils.toTimestamp(year, month, day, hour, minute);
+	}
+    }
+    
     
     function CREDToken()
     {
 	rate = 1333;
-
+	contractDeployed = false;
 	weiRaised = 0;
 	verifyWallet = 0xB4e817449b2fcDEc82e69f02454B42FE95D4d1fD;
 	verifyWallet = 0x7a56d49393c728B9607666e07fFf5E55F51d89f6; //privatenetWallet
@@ -49,19 +69,30 @@ contract CREDToken is StandardToken, Ownable
 	cap =                            1666000000000000000000;
 	
 	balances[verifyFundWallet] = 10500000000000000000000000;
-	balances[verifyWallet] =     39500000000000000000000000;
+//	balances[verifyWallet] =     39500000000000000000000000;
+	balances[verifyWallet] =     11125000000000000000000000;
 
 	earlyInvestorsBalance =       2000000000000000000000000;
 	tokenSaleBalance =           11125000000000000000000000;
 	futureTokenSaleBalance =     10000000000000000000000000;
 	verifyTeamBalance =          10000000000000000000000000;
+	verifyTeamVested =                                    0;
 	advisorsBalance =             5500000000000000000000000;
+	advisorsVested =                                      0;
 	bountyBalance =                875000000000000000000000;
-
+	dtUtils = new DateTime();
     }
+
 
     function () payable {
 	buyCREDTokens(msg.sender);
+    }
+
+    function releaseFutureSale() onlyOwner()
+    {
+//	if time
+	balances[verifyWallet] = balances[verifyWallet] + tokenSaleBalance;
+    
     }
 
     // @return true if the transaction can buy tokens
