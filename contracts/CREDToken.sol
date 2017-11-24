@@ -18,8 +18,6 @@ contract CREDToken is StandardToken, Ownable
     }
 
     UniqueAddressSet public whitelistAddresses;
-//    UniqueAddressSet public advisorsAddresses;
-//    UniqueAddressSet public teamAddresses;
 
     struct KYCAddressSet
     {
@@ -68,7 +66,6 @@ contract CREDToken is StandardToken, Ownable
     address public futureTokenSaleWallet;
     address public verifyTeamWallet;
     address public advisorsWallet;
-//    uint256 public bountyBalance;
     uint256 public weiRaised;
     DateTime public dtUtils;
     
@@ -253,9 +250,7 @@ contract CREDToken is StandardToken, Ownable
 
     // @return true if the transaction can buy tokens
     function validPurchase() internal constant returns (bool) {
-//	bool withinPeriod = now >= startTime && now <= endTime;
 	bool nonZeroPurchase = msg.value != 0;
-//	return withinPeriod && nonZeroPurchase;
 	return nonZeroPurchase;
     }
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
@@ -370,20 +365,7 @@ contract CREDToken is StandardToken, Ownable
 	if (addx == whitelistAddresses.addxs[0]) return true;
 	else return (whitelistAddresses.addxIndex[addx] != 0);
     }
-/*
-    function isInTeamList(address addx) internal returns (bool)
-    {
-	if (addx == teamAddresses.addxs[0]) return true;
-	else return (teamAddresses.addxIndex[addx] != 0);
-    }
 
-    function isInAdvisorsList(address addx) internal returns (bool)
-    {
-	if (addx == advisorsAddresses.addxs[0]) return true;
-	else return (advisorsAddresses.addxIndex[addx] != 0);
-    }
-
-*/
     function forwardFunds(uint256 val) internal {
 	verifyWallet.transfer(val);
     }
@@ -400,72 +382,6 @@ contract CREDToken is StandardToken, Ownable
 	balances[msg.sender] = balances[msg.sender] + tokens;
     }
 
-/*    event BountyTokensTransferred(address sender, address recipient, uint256 amount);
-    event NotEnoughBountyTokens(address sender, uint256 avaliableBalance, uint256 attemptedTransfer);
-    function bountyTransfer(address addx, uint256 amount) onlyOwner public returns (bool)
-    {
-	if (amount <= bountyBalance)
-	{
-	    balances[addx] = balances[addx] + amount;
-	    bountyBalance -= amount;
-	    BountyTokensTransferred(msg.sender, addx, amount);
-	    return true;
-	}
-	else
-	{
-	    NotEnoughBountyTokens(msg.sender, bountyBalance, amount);
-	    return false;
-	}
-    }
-
-    event TeamTokensTransferred(address sender, address recipient, uint256 amount);
-    event NotEnoughTeamTokens(address sender, uint256 avaliableBalance, uint256 attemptedTransfer);
-    function teamTransfer(address addx, uint256 amount) onlyOwner public returns (bool)
-    {
-	if (isInTeamList(addx))
-	{
-	    if (amount <= verifyTeamBalance)
-	    {
-		balances[addx] = balances[addx] + amount;
-    		verifyTeamBalance -= amount;
-		TeamTokensTransferred(msg.sender, addx, amount);
-		return true;
-	    }
-	    else
-	    {
-		NotEnoughTeamTokens(msg.sender, bountyBalance, amount);
-		return false;
-	    }
-	}
-	else return false;
-    }
-
-    event AdvisorsTokensTransferred(address sender, address recipient, uint256 amount);
-    event NotEnoughAdvisorsTokens(address sender, uint256 avaliableBalance, uint256 attemptedTransfer);
-    event AdvisorsTokensLocked(address sender, string message, uint256 timestamp);
-    function advisorsTransfer(address addx, uint256 amount) onlyOwner public returns (bool)
-    {
-	if (now < advisorsLockTime1)
-	    AdvisorsTokensLocked(msg.sender, "Tokens locked till", advisorsLockTime1);
-	if (isInAdvisorsList(addx))
-	{
-	    if (amount <= advisorsBalance)
-	    {
-		balances[addx] = balances[addx] + amount;
-    		advisorsBalance -= amount;
-		AdvisorsTokensTransferred(msg.sender, addx, amount);
-		return true;
-	    }
-	    else
-	    {
-		NotEnoughAdvisorsTokens(msg.sender, bountyBalance, amount);
-		return false;
-	    }
-	}
-	else return false;
-    }
-*/
-
     event AddressAddedToWhiteList(address sender, uint256 index, address addx);
     function _AddAddressToWL(address addx, uint256 amount) internal
     {
@@ -477,26 +393,7 @@ contract CREDToken is StandardToken, Ownable
 	    _AddNewCustomer(addx, 0, 0);
 	    setAddressVerified(addx);
     }
-/*
-    function _AddAddressToAL(address addx) internal
-    {
-            advisorsAddresses.addxs[advisorsAddresses.size] = addx;
-            advisorsAddresses.addxIndex[addx] = advisorsAddresses.size;
-            ++advisorsAddresses.size;
-	    _AddNewCustomer(addx, 0, 0);
-	    setAddressVerified(addx);
 
-    }
-
-    function _AddAddressToTL(address addx) internal
-    {
-            teamAddresses.addxs[teamAddresses.size] = addx;
-            teamAddresses.addxIndex[addx] = teamAddresses.size;
-            ++teamAddresses.size;
-	    _AddNewCustomer(addx, 0, 0);
-	    setAddressVerified(addx);
-    }
-*/
     function setAddressVerified(address addx) onlyOwner public
     {
 	uint256 cIndex;
@@ -547,47 +444,7 @@ contract CREDToken is StandardToken, Ownable
 
 	}
     }
-/*
-    function AddAdressesToAdvisorslist(address[] addxs) onlyOwner
-    {
-	for (uint16 i = 0; i < addxs.length; ++i)
-	{
-	    AddTolist(addxs[i], "Advisors", i);
-	    if (advisorsAddresses.size == 0)
-	    {
-		_AddAddressToAL(addxs[i]);
-	    }
-    	    else {
-    		if (advisorsAddresses.addxIndex[addxs[i]] == 0 && advisorsAddresses.addxs[0] != addxs[i])
-    		{
-		    _AddAddressToAL(addxs[i]);
-    		}
-    		else AddressAlreadyInList(msg.sender, "Address already in ", "Advisors list");
-    	    }
 
-	}
-    }
-
-    function AddAdressesToTeamlist(address[] addxs) onlyOwner
-    {
-	for (uint16 i = 0; i < addxs.length; ++i)
-	{
-	    AddTolist(addxs[i], "Team", i);
-	    if (teamAddresses.size == 0)
-	    {
-		_AddAddressToTL(addxs[i]);
-	    }
-    	    else {
-    		if (teamAddresses.addxIndex[addxs[i]] == 0 && teamAddresses.addxs[0] != addxs[i])
-    		{
-		    _AddAddressToTL(addxs[i]);
-    		}
-    		else AddressAlreadyInList(msg.sender, "Address already in ", "Team list");
-    	    }
-
-	}
-    }
-*/
     event ListWhitelist(address sender, uint256 index, address addx, uint256 amount);
     function ListWhitelistAddresses() onlyOwner public
     {
@@ -596,27 +453,6 @@ contract CREDToken is StandardToken, Ownable
 	    ListWhitelist(msg.sender, i, whitelistAddresses.addxs[i], whitelistAddresses.amount[i]);
 	}
     }
-/*
-    event ListAdvisors(address sender, uint16 index, address addx);
-    function ListAdvisorsAddresses() onlyOwner
-    {
-	for (uint16 i = 0; i < advisorsAddresses.size; ++i)
-	{
-	    ListWhitelist(msg.sender, i, advisorsAddresses.addxs[i]);
-	}
-    }
-
-    event ListTeam(address sender, uint16 index, address addx);
-    function ListTeamAddresses() public onlyOwner
-    {
-	for (uint16 i = 0; i < teamAddresses.size; ++i)
-	{
-	    ListWhitelist(msg.sender, i, teamAddresses.addxs[i]);
-	}
-    }
-*/    
-    
-    
     
 /* Rufund function.
     event weiRefunded(address sender, address recipient, uint256 amount);
