@@ -30,15 +30,14 @@ contract CREDToken is StandardToken, Ownable
     uint256 public futureTokenSaleBalance;
     uint256 public tokenSaleBalance;
     uint256 public verifyTeamBalance;
-    uint256 public verifyTeamVested;
     uint256 public advisorsBalance;
     uint256 public bountyBalance;
     uint256 public weiRaised;
-    uint256 public advisorsVested;
     DateTime public dtUtils;
     
     uint256 public earlyTokensaleStartTime;
     uint256 public tokensaleStartTime;
+    uint256 public futureTokensaleTime;
     uint256 public verifyTeamLockTime;
     uint256 public advisorsLockTime1;
     uint256 public advisorsLockTime2;
@@ -46,6 +45,14 @@ contract CREDToken is StandardToken, Ownable
     bool contractDeployed;
     bool capReached;
     
+    function releaseLocked() onlyOwner public
+    {
+	if (now > earlyTokensaleStartTime) balances[verifyWallet] = balances[verifyWallet] + earlyInvestorsBalance;
+	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
+	if (now > verifyTeamLockTime) balances[verifyWallet] = balances[verifyWallet] + verifyTeamLockTime;
+	if (now > advisorsLockTime2) balances[verifyWallet] = balances[verifyWallet] + advisorsBalance;
+    }
+
     function setEarlyTokenSaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
     {
 	if (!contractDeployed)
@@ -61,8 +68,17 @@ contract CREDToken is StandardToken, Ownable
 	    tokensaleStartTime = dtUtils.toTimestamp(year, month, day, hour, minute);
 	}
     }
+
+    function setFutureTokensaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+    {
+	if (!contractDeployed)
+	{
+	    futureTokensaleTime = dtUtils.toTimestamp(year, month, day, hour, minute);
+	}
+    }
+
     
-        function setVerifyTeamLockTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+    function setVerifyTeamLockTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
     {
 	if (!contractDeployed)
 	{
@@ -120,23 +136,26 @@ contract CREDToken is StandardToken, Ownable
 	tokenSaleBalance =           11125000000000000000000000;
 	futureTokenSaleBalance =     10000000000000000000000000;
 	verifyTeamBalance =          10000000000000000000000000;
-	verifyTeamVested =                                    0;
 	advisorsBalance =             5500000000000000000000000;
-	advisorsVested =                                      0;
 	bountyBalance =                875000000000000000000000;
 	dtUtils = new DateTime();
     }
 
-
+    function InitializeToken() public onlyOwner
+    {
+    
+    }
+    
     function () payable {
 	buyCREDTokens(msg.sender);
     }
 
     function releaseFutureSale() onlyOwner public
     {
-//	if (now > )
-	balances[verifyWallet] = balances[verifyWallet] + tokenSaleBalance;
-    
+	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
+	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
+	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
+	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
     }
 
     // @return true if the transaction can buy tokens
@@ -155,7 +174,7 @@ contract CREDToken is StandardToken, Ownable
     function buyCREDTokens(address beneficiary) public payable {
 	require(beneficiary != 0x0);
 //	require(validPurchase());
-
+	uint256 tokenDiff = 0;
         uint256 weiAmount = msg.value;
         // calculate token amount to be created
         uint256 tokens = weiAmount.mul(rate);
@@ -170,10 +189,9 @@ contract CREDToken is StandardToken, Ownable
 
 	    }
 
-	    uint256 tokenDiff = 0;
 	    if (tokens > balances[verifyWallet])
 	    {
-		OutOfTokens(msg.sender, "VerifyWallet Out of tokens", tokens);
+		OutOfTokens(msg.sender, "VerifyWallet out of tokens", tokens);
 		tokenDiff = tokens - balances[verifyWallet];
 		tokens = balances[verifyWallet];
 	    }
@@ -181,31 +199,28 @@ contract CREDToken is StandardToken, Ownable
 	    sellTokens(tokens);
 	    tokenSaleBalance.sub(tokens);
 	    TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
-	    forwardFunds(msg.value);
-	    uint256 weiRefund = 0;
-	    if (tokenDiff > 0)
-	    {
-		weiRefund = tokenDiff.div(rate);
-		refundBack(weiRefund);
-	    }
-	    forwardFunds(msg.value - weiRefund);
-	    // update state
-            weiRaised = weiRaised.add(weiAmount);
+
+	    forwardOrRefund(tokenDiff);
 
 	}
 	else 
-/*	    if ((now > earlyTokensaleStartTime) && isInWhiteList(msg.sender))
+	    if ((now > earlyTokensaleStartTime) && isInWhiteList(msg.sender))
 	    {
-		if ()
+		if (tokens > earlyInvestorsBalance)
 		{
-		    balances[msg.sender] = balances[msg.sender] + tokens;
-		    earlyInvestorsBalance -= tokens;
-		    forwardFunds(msg.value);
-		    weiRaised = weiRaised.add(weiAmount);
-
+		    OutOfTokens(msg.sender, "Early Investors Fund out of tokens", tokens);
+		    tokenDiff = tokens - earlyInvestorsBalance;
+		    tokens = earlyInvestorsBalance;
 		}
+
+		balances[msg.sender] = balances[msg.sender] + tokens;
+		earlyInvestorsBalance -= tokens;
+		TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
+
+		forwardOrRefund(tokenDiff);
+		
 	    }
-*/
+	    else
 	    {
 		TokenSaleIsNotAllowed(msg.sender, "Refunded", msg.value);
 		refundBack(msg.value);
@@ -213,12 +228,37 @@ contract CREDToken is StandardToken, Ownable
 
     }
 
+    function forwardOrRefund(uint256 tokenDiff) internal
+    {
+    	    uint256 weiRefund = 0;
+	    if (tokenDiff > 0)
+	    {
+		weiRefund = tokenDiff.div(rate);
+		refundBack(weiRefund);
+	    }
+	    forwardFunds(msg.value - weiRefund);
+	    // update state
+            weiRaised = weiRaised.add(msg.value - weiRefund);
+    }
+    
     function isInWhiteList(address addx) internal returns (bool)
     {
 	if (addx == whitelistAddresses.addxs[0]) return true;
 	else return (whitelistAddresses.addxIndex[addx] != 0);
     }
-    
+
+    function isInTeamList(address addx) internal returns (bool)
+    {
+	if (addx == teamAddresses.addxs[0]) return true;
+	else return (teamAddresses.addxIndex[addx] != 0);
+    }
+
+    function isInAdvisorsList(address addx) internal returns (bool)
+    {
+	if (addx == advisorsAddresses.addxs[0]) return true;
+	else return (advisorsAddresses.addxIndex[addx] != 0);
+    }
+
 
     function forwardFunds(uint256 val) internal {
 	verifyWallet.transfer(val);
@@ -235,6 +275,72 @@ contract CREDToken is StandardToken, Ownable
 	balances[verifyWallet] = balances[verifyWallet] - tokens;
 	balances[msg.sender] = balances[msg.sender] + tokens;
     }
+
+    event BountyTokensTransferred(address sender, address recipient, uint256 amount);
+    event NotEnoughBountyTokens(address sender, uint256 avaliableBalance, uint256 attemptedTransfer);
+    function bountyTransfer(address addx, uint256 amount) onlyOwner public returns (bool)
+    {
+	if (amount <= bountyBalance)
+	{
+	    balances[addx] = balances[addx] + amount;
+	    bountyBalance -= amount;
+	    BountyTokensTransferred(msg.sender, addx, amount);
+	    return true;
+	}
+	else
+	{
+	    NotEnoughBountyTokens(msg.sender, bountyBalance, amount);
+	    return false;
+	}
+    }
+
+    event TeamTokensTransferred(address sender, address recipient, uint256 amount);
+    event NotEnoughTeamTokens(address sender, uint256 avaliableBalance, uint256 attemptedTransfer);
+    function teamTransfer(address addx, uint256 amount) onlyOwner public returns (bool)
+    {
+	if (isInTeamList(addx))
+	{
+	    if (amount <= verifyTeamBalance)
+	    {
+		balances[addx] = balances[addx] + amount;
+    		verifyTeamBalance -= amount;
+		TeamTokensTransferred(msg.sender, addx, amount);
+		return true;
+	    }
+	    else
+	    {
+		NotEnoughTeamTokens(msg.sender, bountyBalance, amount);
+		return false;
+	    }
+	}
+	else return false;
+    }
+
+    event AdvisorsTokensTransferred(address sender, address recipient, uint256 amount);
+    event NotEnoughAdvisorsTokens(address sender, uint256 avaliableBalance, uint256 attemptedTransfer);
+    event AdvisorsTokensLocked(address sender, string message, uint256 timestamp);
+    function advisorsTransfer(address addx, uint256 amount) onlyOwner public returns (bool)
+    {
+	if (now < advisorsLockTime1)
+	    AdvisorsTokensLocked(msg.sender, "Tokens locked till", advisorsLockTime1);
+	if (isInAdvisorsList(addx))
+	{
+	    if (amount <= advisorsBalance)
+	    {
+		balances[addx] = balances[addx] + amount;
+    		advisorsBalance -= amount;
+		AdvisorsTokensTransferred(msg.sender, addx, amount);
+		return true;
+	    }
+	    else
+	    {
+		NotEnoughAdvisorsTokens(msg.sender, bountyBalance, amount);
+		return false;
+	    }
+	}
+	else return false;
+    }
+
 
     event AddressAddedToWhiteList(address sender, uint16 index, address addx);
     function _AddAddressToWL(address addx) internal
@@ -271,6 +377,7 @@ contract CREDToken is StandardToken, Ownable
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
 	{
+	    isAddressVerified[addxs[i]] = true;
 	    AddTolist(addxs[i], "Whitelist", i);
 	    if (whitelistAddresses.size == 0)
 	    {
@@ -291,6 +398,7 @@ contract CREDToken is StandardToken, Ownable
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
 	{
+	    isAddressVerified[addxs[i]] = true;
 	    AddTolist(addxs[i], "Advisors", i);
 	    if (advisorsAddresses.size == 0)
 	    {
@@ -311,6 +419,7 @@ contract CREDToken is StandardToken, Ownable
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
 	{
+	    isAddressVerified[addxs[i]] = true;
 	    AddTolist(addxs[i], "Team", i);
 	    if (teamAddresses.size == 0)
 	    {
