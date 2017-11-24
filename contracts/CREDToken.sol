@@ -20,7 +20,43 @@ contract CREDToken is StandardToken, Ownable
     UniqueAddressSet public advisorsAddresses;
     UniqueAddressSet public teamAddresses;
 
-    mapping (address => bool) public isAddressVerified;
+    struct KYCAddressSet
+    {
+	mapping (address => uint256) addxIndex;
+	mapping (uint256 => address) addxs;
+	uint256 size;
+	mapping (uint256 => bool) isVerified;
+	mapping (uint256 => uint256) weiSpent;
+	mapping (uint256 => uint256) tokensPurchased;
+	mapping (uint256 => uint256) lastPurchaseTimestamp;
+    }
+
+    KYCAddressSet customerInfo;
+
+    function isInCustomerList(address addx) internal returns (bool)
+    {
+	if (addx == customerInfo.addxs[0]) return true;
+	else return (customerInfo.addxIndex[addx] != 0);
+    }
+    
+    function _AddNewCustomer(address addx, uint256 weiSpent, uint256 tokensPurchased) internal
+    {
+            customerInfo.addxs[customerInfo.size] = addx;
+            customerInfo.weiSpent[customerInfo.size] = weiSpent;
+            customerInfo.tokensPurchased[customerInfo.size] = tokensPurchased;
+            customerInfo.lastPurchaseTimestamp[customerInfo.size] = now;
+            customerInfo.addxIndex[addx] = customerInfo.size;
+            ++customerInfo.size;
+    }
+
+    function _UpdateCustomer(address addx, uint256 weiSpent, uint256 tokensPurchased) internal
+    {
+	uint256 cIndex = customerInfo.addxIndex[addx];
+	customerInfo.weiSpent[cIndex] += weiSpent;
+        customerInfo.tokensPurchased[cIndex] += tokensPurchased;
+        customerInfo.lastPurchaseTimestamp[cIndex] = now;
+        
+    }
 
     uint256 rate;
     uint256 cap;
@@ -149,6 +185,8 @@ contract CREDToken is StandardToken, Ownable
     function () payable {
 	buyCREDTokens(msg.sender);
     }
+
+    
 
     function releaseFutureSale() onlyOwner public
     {
@@ -349,7 +387,8 @@ contract CREDToken is StandardToken, Ownable
             whitelistAddresses.addxIndex[addx] = whitelistAddresses.size;
             AddressAddedToWhiteList(msg.sender, whitelistAddresses.size, addx);
             ++whitelistAddresses.size;
-            
+	    _AddNewCustomer(addx, 0, 0);
+	    setAddressVerified(addx);
     }
 
     function _AddAddressToAL(address addx) internal
@@ -357,6 +396,9 @@ contract CREDToken is StandardToken, Ownable
             advisorsAddresses.addxs[advisorsAddresses.size] = addx;
             advisorsAddresses.addxIndex[addx] = advisorsAddresses.size;
             ++advisorsAddresses.size;
+	    _AddNewCustomer(addx, 0, 0);
+	    setAddressVerified(addx);
+
     }
 
     function _AddAddressToTL(address addx) internal
@@ -364,11 +406,14 @@ contract CREDToken is StandardToken, Ownable
             teamAddresses.addxs[teamAddresses.size] = addx;
             teamAddresses.addxIndex[addx] = teamAddresses.size;
             ++teamAddresses.size;
+	    _AddNewCustomer(addx, 0, 0);
+	    setAddressVerified(addx);
     }
 
-    function setAddressVerifyed(address addx) onlyOwner public returns(bool)
+    function setAddressVerified(address addx) onlyOwner public returns(bool)
     {
-	isAddressVerified[addx] = true;
+	uint256 cIndex = customerInfo.addxIndex[addx];
+	customerInfo.isVerified[cIndex] = true;
     }
     
     event AddTolist(address addx, string listname, uint16 index);
@@ -377,7 +422,6 @@ contract CREDToken is StandardToken, Ownable
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
 	{
-	    isAddressVerified[addxs[i]] = true;
 	    AddTolist(addxs[i], "Whitelist", i);
 	    if (whitelistAddresses.size == 0)
 	    {
@@ -398,7 +442,6 @@ contract CREDToken is StandardToken, Ownable
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
 	{
-	    isAddressVerified[addxs[i]] = true;
 	    AddTolist(addxs[i], "Advisors", i);
 	    if (advisorsAddresses.size == 0)
 	    {
@@ -419,7 +462,6 @@ contract CREDToken is StandardToken, Ownable
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
 	{
-	    isAddressVerified[addxs[i]] = true;
 	    AddTolist(addxs[i], "Team", i);
 	    if (teamAddresses.size == 0)
 	    {
