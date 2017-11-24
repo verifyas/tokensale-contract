@@ -18,8 +18,8 @@ contract CREDToken is StandardToken, Ownable
     }
 
     UniqueAddressSet public whitelistAddresses;
-    UniqueAddressSet public advisorsAddresses;
-    UniqueAddressSet public teamAddresses;
+//    UniqueAddressSet public advisorsAddresses;
+//    UniqueAddressSet public teamAddresses;
 
     struct KYCAddressSet
     {
@@ -59,17 +59,16 @@ contract CREDToken is StandardToken, Ownable
         
     }
 
-    uint256 rate;
-    uint256 cap;
-    uint256 maxCap;
-    address verifyWallet;
-    address verifyFundWallet;
-    uint256 public earlyInvestorsBalance;
-    uint256 public futureTokenSaleBalance;
-    uint256 public tokenSaleBalance;
-    uint256 public verifyTeamBalance;
-    uint256 public advisorsBalance;
-    uint256 public bountyBalance;
+    uint256 public rate;
+    uint256 public cap;
+    uint256 public maxCap;
+    address public verifyWallet;
+    address public verifyFundWallet;
+    address public miscellaneousWallet;
+    address public futureTokenSaleWallet;
+    address public verifyTeamWallet;
+    address public advisorsWallet;
+//    uint256 public bountyBalance;
     uint256 public weiRaised;
     DateTime public dtUtils;
     
@@ -85,10 +84,23 @@ contract CREDToken is StandardToken, Ownable
     
     function releaseLocked() onlyOwner public
     {
-	if (now > earlyTokensaleStartTime) balances[verifyWallet] = balances[verifyWallet] + earlyInvestorsBalance;
-	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
-	if (now > verifyTeamLockTime) balances[verifyWallet] = balances[verifyWallet] + verifyTeamLockTime;
-	if (now > advisorsLockTime2) balances[verifyWallet] = balances[verifyWallet] + advisorsBalance;
+	if (now > futureTokensaleTime)
+	{
+	    balances[verifyWallet] = balances[verifyWallet] + balances[futureTokenSaleWallet];
+	    balances[futureTokenSaleWallet] = 0;
+	}
+
+	if (now > verifyTeamLockTime)
+	{
+	    balances[verifyWallet] = balances[verifyWallet] + balances[verifyTeamWallet];
+	    balances[verifyTeamWallet] = 0;
+	}
+	
+	if (now > advisorsLockTime2)
+	{
+	    balances[verifyWallet] = balances[verifyWallet] + balances[advisorsWallet];
+	    balances[advisorsWallet] = 0;
+	}
     }
 
     function setEarlyTokenSaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
@@ -156,6 +168,37 @@ contract CREDToken is StandardToken, Ownable
 	}    
     }
 
+    function setVerifyTeamWallet(address Address) onlyOwner public
+    {
+	if (!contractDeployed)
+	{
+	    verifyTeamWallet = Address;
+	}    
+    }
+
+    function setVerifyAdvisorsWallet(address Address) onlyOwner public
+    {
+	if (!contractDeployed)
+	{
+	    advisorsWallet = Address;
+	}    
+    }
+
+    function setVerifyMiscWallet(address Address) onlyOwner public
+    {
+	if (!contractDeployed)
+	{
+	    miscellaneousWallet = Address;
+	}    
+    }
+
+    function setConversionRate(uint256 cRate) onlyOwner public
+    {
+	if (!contractDeployed)
+	{
+	    rate = cRate;
+	}    
+    }
     
     function deployContract() public onlyOwner
     {
@@ -169,25 +212,19 @@ contract CREDToken is StandardToken, Ownable
 
     function InitializeToken() public onlyOwner
     {
-	if ((verifyWallet != 0x0) && (verifyFundWallet != 0x0))
-	{
-	    rate = 1333;
-	    contractDeployed = false;
-	    weiRaised = 0;
-	    maxCap =                         8345000000000000000000;
-	    totalSupply =                50000000000000000000000000;
-	    cap =                            1666000000000000000000;
+	contractDeployed = false;
+	weiRaised = 0;
+	maxCap =                         	    8345000000000000000000;
+	totalSupply =                		50000000000000000000000000;
+	cap =                            	    1666000000000000000000;
 	
-	    balances[verifyFundWallet] = 10500000000000000000000000;
-	    balances[verifyWallet] =     11125000000000000000000000;
+	balances[verifyFundWallet] = 		10500000000000000000000000;
+	balances[verifyWallet] =     		11125000000000000000000000;
 
-	    earlyInvestorsBalance =       2000000000000000000000000;
-	    tokenSaleBalance =           11125000000000000000000000;
-	    futureTokenSaleBalance =     10000000000000000000000000;
-	    verifyTeamBalance =          10000000000000000000000000;
-	    advisorsBalance =             5500000000000000000000000;
-	    bountyBalance =                875000000000000000000000;
-	}
+	balances[miscellaneousWallet] =       	 2875000000000000000000000;
+	balances[futureTokenSaleWallet] =     	10000000000000000000000000;
+	balances[verifyTeamWallet] =          	10000000000000000000000000;
+	balances[advisorsWallet] =             	 5500000000000000000000000;
     }
 
     function deployToProduction() public onlyOwner
@@ -196,42 +233,28 @@ contract CREDToken is StandardToken, Ownable
 	weiRaised = 0;
 	verifyWallet = 0xB4e817449b2fcDEc82e69f02454B42FE95D4d1fD;
 	verifyFundWallet = 0x028e27D09bb37FA00a1691fFE935D190C8D1668c;
-
+	miscellaneousWallet =       0x7F744e420874AF3752CE657181e4b37CA9594779;
+	futureTokenSaleWallet =     0xb30CC06c46A0Ad3Ba600f4a66FB68F135EAb716D;
+	verifyTeamWallet = 0xC29789f465DF1AAF791027f4CABFc6Eb3EC2fc19;
+	advisorsWallet = 0x14589ba142Ff8686772D178A49503D176628147a;
+	
 	maxCap =                         8345000000000000000000;
 	totalSupply =                50000000000000000000000000;
 	cap =                            1666000000000000000000;
 	
-	balances[verifyFundWallet] = 10500000000000000000000000;
-//	balances[verifyWallet] =     39500000000000000000000000;
-	balances[verifyWallet] =     11125000000000000000000000;
+	InitializeToken();
 
-	earlyInvestorsBalance =       2000000000000000000000000;
-	tokenSaleBalance =           11125000000000000000000000;
-	futureTokenSaleBalance =     10000000000000000000000000;
-	verifyTeamBalance =          10000000000000000000000000;
-	advisorsBalance =             5500000000000000000000000;
-	bountyBalance =                875000000000000000000000;
 	setEarlyTokenSaleTime(2017, 11, 28, 2, 0);
 	setTokensaleTime(2017, 11, 29, 2, 0);
 	setFutureTokensaleTime(2018, 11, 29, 2, 0);
 	setVerifyTeamLockTime(2018, 11, 29, 2, 0);
 	setAdvisorsLockTime1(2018, 2, 29, 2, 0);
 	setAdvisorsLockTime2(2018, 11, 29, 2, 0);
-	contractDeployed = true;
+	contractDeployed = false;
     }
     
     function () payable {
 	buyCREDTokens(msg.sender);
-    }
-
-    
-
-    function releaseFutureSale() onlyOwner public
-    {
-	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
-	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
-	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
-	if (now > futureTokensaleTime) balances[verifyWallet] = balances[verifyWallet] + futureTokenSaleBalance;
     }
 
     // @return true if the transaction can buy tokens
@@ -247,7 +270,8 @@ contract CREDToken is StandardToken, Ownable
     event OutOfTokens(address sender, string message, uint256 lastPurchase);
     event WLTokensLimitReached(address sender, string message, uint256 lastPurchase);
     event HardCapReached(address sender, string message, string message2);
-    
+    event Debug(address sender, uint256 spent, uint256 amount, int256 left);
+
     function buyCREDTokens(address beneficiary) public payable {
 	require(beneficiary != 0x0);
 //	require(validPurchase());
@@ -272,9 +296,8 @@ contract CREDToken is StandardToken, Ownable
 		tokenDiff = tokens - balances[verifyWallet];
 		tokens = balances[verifyWallet];
 	    }
-	    
+
 	    sellTokens(tokens);
-	    tokenSaleBalance.sub(tokens);
 	    TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 
 	    uint256 weiResult = forwardOrRefund(tokenDiff);
@@ -287,15 +310,16 @@ contract CREDToken is StandardToken, Ownable
 
 		uint256 cIndex = customerInfo.addxIndex[msg.sender];
 		uint256 wlIndex = whitelistAddresses.addxIndex[msg.sender];
-		
+
 		int256 tokensLeft = (int256(whitelistAddresses.amount[wlIndex]) - int256(customerInfo.weiSpent[cIndex]))*int256(rate);
-		
+
+		Debug(msg.sender, whitelistAddresses.amount[wlIndex], customerInfo.weiSpent[cIndex], tokensLeft);
 		if (tokensLeft < 0)
 		{
 		    refundBack(msg.value);
 		    return;
 		}
-		
+
 		tokenDiff = 0;
 		if (int256(tokens) > tokensLeft)
 		{
@@ -306,18 +330,21 @@ contract CREDToken is StandardToken, Ownable
 		if (tokens > balances[verifyWallet])
 		{
 		    OutOfTokens(msg.sender, "VerifyWallet out of tokens", tokens);
-		    
+
 		    tokenDiff = tokens - balances[verifyWallet] + tokenDiff;
-		    
+
 		    tokens = balances[verifyWallet];
 		}
 
 		sellTokens(tokens);
 		TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 
-		forwardOrRefund(tokenDiff);
-		if (isInCustomerList(msg.sender)) _UpdateCustomer (msg.sender, weiResult, tokens);
-		else _AddNewCustomer (msg.sender, weiResult, tokens);
+        	//customerInfo.weiSpent[cIndex] = customerInfo.weiSpent[cIndex] + forwardOrRefund(tokenDiff);
+		
+		uint256 weiDiff = forwardOrRefund(tokenDiff);
+		
+		if (isInCustomerList(msg.sender)) _UpdateCustomer (msg.sender, weiDiff, tokens);
+		else _AddNewCustomer (msg.sender, weiDiff, tokens);
 
 	    }
 	    else
@@ -330,16 +357,18 @@ contract CREDToken is StandardToken, Ownable
 
     function forwardOrRefund(uint256 tokenDiff) internal returns (uint256)
     {
+    	    uint256 weiDiff = 0;
     	    uint256 weiRefund = 0;
 	    if (tokenDiff > 0)
 	    {
 		weiRefund = tokenDiff.div(rate);
 		refundBack(weiRefund);
 	    }
-	    forwardFunds(msg.value - weiRefund);
+	    weiDiff = msg.value - weiRefund;
+	    forwardFunds(weiDiff);
 	    // update state
-            weiRaised = weiRaised.add(msg.value - weiRefund);
-            return msg.value - weiRefund;
+            weiRaised = weiRaised.add(weiDiff);
+            return weiDiff;
     }
     
     function isInWhiteList(address addx) internal returns (bool)
@@ -347,7 +376,7 @@ contract CREDToken is StandardToken, Ownable
 	if (addx == whitelistAddresses.addxs[0]) return true;
 	else return (whitelistAddresses.addxIndex[addx] != 0);
     }
-
+/*
     function isInTeamList(address addx) internal returns (bool)
     {
 	if (addx == teamAddresses.addxs[0]) return true;
@@ -360,7 +389,7 @@ contract CREDToken is StandardToken, Ownable
 	else return (advisorsAddresses.addxIndex[addx] != 0);
     }
 
-
+*/
     function forwardFunds(uint256 val) internal {
 	verifyWallet.transfer(val);
     }
@@ -377,7 +406,7 @@ contract CREDToken is StandardToken, Ownable
 	balances[msg.sender] = balances[msg.sender] + tokens;
     }
 
-    event BountyTokensTransferred(address sender, address recipient, uint256 amount);
+/*    event BountyTokensTransferred(address sender, address recipient, uint256 amount);
     event NotEnoughBountyTokens(address sender, uint256 avaliableBalance, uint256 attemptedTransfer);
     function bountyTransfer(address addx, uint256 amount) onlyOwner public returns (bool)
     {
@@ -441,7 +470,7 @@ contract CREDToken is StandardToken, Ownable
 	}
 	else return false;
     }
-
+*/
 
     event AddressAddedToWhiteList(address sender, uint256 index, address addx);
     function _AddAddressToWL(address addx, uint256 amount) internal
@@ -454,7 +483,7 @@ contract CREDToken is StandardToken, Ownable
 	    _AddNewCustomer(addx, 0, 0);
 	    setAddressVerified(addx);
     }
-
+/*
     function _AddAddressToAL(address addx) internal
     {
             advisorsAddresses.addxs[advisorsAddresses.size] = addx;
@@ -473,7 +502,7 @@ contract CREDToken is StandardToken, Ownable
 	    _AddNewCustomer(addx, 0, 0);
 	    setAddressVerified(addx);
     }
-
+*/
     function setAddressVerified(address addx) onlyOwner public
     {
 	uint256 cIndex;
