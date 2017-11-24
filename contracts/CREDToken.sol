@@ -105,7 +105,7 @@ contract CREDToken is StandardToken, Ownable
 	contractDeployed = false;
 	weiRaised = 0;
 	verifyWallet = 0xB4e817449b2fcDEc82e69f02454B42FE95D4d1fD;
-	verifyWallet = 0x7a56d49393c728B9607666e07fFf5E55F51d89f6; //privatenetWallet
+	verifyWallet = 0x230F6960032714894bb060C837d099cff71D5285; //privatenetWallet
 	verifyFundWallet = 0x028e27D09bb37FA00a1691fFE935D190C8D1668c;
 	verifyFundWallet = 0xC2651a4c61e55bFb8097A191eeeeD1C0c8F13b9a; //privatenetWallet
 
@@ -150,6 +150,7 @@ contract CREDToken is StandardToken, Ownable
 
     event EarlyInvestorsBalanceReleased(address own, string message, uint256 TokensAdded);
     event TokenSaleIsNotAllowed(address sender, string message, uint256 amount);
+    event OutOfTokens(address sender, string message, uint256 lastPurchase);
     
     function buyCREDTokens(address beneficiary) public payable {
 	require(beneficiary != 0x0);
@@ -164,7 +165,7 @@ contract CREDToken is StandardToken, Ownable
 	    if (earlyInvestorsBalance > 0)
 	    {
 		balances[verifyWallet] = balances[verifyWallet] + earlyInvestorsBalance;
-		EarlyInvestorsBalanceReleased(msg.sender, "Tokens Transferres to verifyWallet",  earlyInvestorsBalance);
+		EarlyInvestorsBalanceReleased(msg.sender, "Tokens Transferred to verifyWallet",  earlyInvestorsBalance);
 		earlyInvestorsBalance = 0;
 
 	    }
@@ -172,6 +173,7 @@ contract CREDToken is StandardToken, Ownable
 	    uint256 tokenDiff = 0;
 	    if (tokens > balances[verifyWallet])
 	    {
+		OutOfTokens(msg.sender, "VerifyWallet Out of tokens", tokens);
 		tokenDiff = tokens - balances[verifyWallet];
 		tokens = balances[verifyWallet];
 	    }
@@ -180,11 +182,13 @@ contract CREDToken is StandardToken, Ownable
 	    tokenSaleBalance.sub(tokens);
 	    TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 	    forwardFunds(msg.value);
+	    uint256 weiRefund = 0;
 	    if (tokenDiff > 0)
 	    {
-		uint256 weiRefund = tokenDiff.div(rate);
+		weiRefund = tokenDiff.div(rate);
 		refundBack(weiRefund);
 	    }
+	    forwardFunds(msg.value - weiRefund);
 	    // update state
             weiRaised = weiRaised.add(weiAmount);
 
@@ -220,8 +224,10 @@ contract CREDToken is StandardToken, Ownable
 	verifyWallet.transfer(val);
     }
 
+    event WeiRefunded(address sender, string message, uint256 amount);
     function refundBack(uint256 weis) internal {
 	msg.sender.transfer(weis);
+	WeiRefunded(msg.sender, "Refunded: ", weis);
     }
 
     function sellTokens(uint256 tokens) internal
