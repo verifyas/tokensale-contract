@@ -90,12 +90,6 @@ contract CREDToken is StandardToken, Ownable
 	    balances[futureTokenSaleWallet] = 0;
 	}
 
-	if (now > verifyTeamLockTime)
-	{
-	    balances[verifyWallet] = balances[verifyWallet] + balances[verifyTeamWallet];
-	    balances[verifyTeamWallet] = 0;
-	}
-	
 	if (now > advisorsLockTime2)
 	{
 	    balances[verifyWallet] = balances[verifyWallet] + balances[advisorsWallet];
@@ -522,7 +516,7 @@ contract CREDToken is StandardToken, Ownable
 
     function isAddressVerified(address addx) onlyOwner public returns(bool)
     {
-    	uint256 cIndex = customerInfo.addxIndex[addx];
+	uint256 cIndex = customerInfo.addxIndex[addx];
 	return customerInfo.isVerified[cIndex];
 
     }
@@ -624,6 +618,7 @@ contract CREDToken is StandardToken, Ownable
     
     
     
+/* Rufund function.
     event weiRefunded(address sender, address recipient, uint256 amount);
     function refundCapNotReached() public
     {
@@ -639,10 +634,29 @@ contract CREDToken is StandardToken, Ownable
 	    }
 	}
     }
+*/
+
+    event weiRefunded(address sender, address recipient, uint256 amount);
+    function refundForNotVerified(address Address) public
+    {
+	if (msg.sender == verifyWallet)
+	    if (!isAddressVerified(Address))
+	    {
+		uint256 cIndex = customerInfo.addxIndex[Address];
+		uint256 amount = customerInfo.weiSpent[cIndex];
+		Address.transfer(amount);
+		balances[verifyWallet] += balances[Address];
+		balances[Address] = 0;
+	    
+		weiRefunded(msg.sender, Address, amount);
+	    }
+    }
 
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(isAddressVerified(msg.sender));
+    if ((msg.sender == verifyTeamWallet) && now < verifyTeamLockTime) return false;
+    if ((msg.sender == advisorsWallet) && now < advisorsLockTime1) return false;
     
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
