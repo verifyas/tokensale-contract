@@ -11,9 +11,10 @@ contract CREDToken is StandardToken, Ownable
 
     struct UniqueAddressSet
     {
-	mapping (address => uint16) addxIndex;
-	mapping (uint16 => address) addxs;
-	uint16 size;
+	mapping (address => uint256) addxIndex;
+	mapping (uint256 => address) addxs;
+	uint256 size;
+	mapping (uint256 => uint256) amount;
     }
 
     UniqueAddressSet public whitelistAddresses;
@@ -60,6 +61,7 @@ contract CREDToken is StandardToken, Ownable
 
     uint256 rate;
     uint256 cap;
+    uint256 maxCap;
     address verifyWallet;
     address verifyFundWallet;
     uint256 public earlyInvestorsBalance;
@@ -172,7 +174,7 @@ contract CREDToken is StandardToken, Ownable
 	    rate = 1333;
 	    contractDeployed = false;
 	    weiRaised = 0;
-
+	    maxCap =                         8345000000000000000000;
 	    totalSupply =                50000000000000000000000000;
 	    cap =                            1666000000000000000000;
 	
@@ -195,6 +197,7 @@ contract CREDToken is StandardToken, Ownable
 	verifyWallet = 0xB4e817449b2fcDEc82e69f02454B42FE95D4d1fD;
 	verifyFundWallet = 0x028e27D09bb37FA00a1691fFE935D190C8D1668c;
 
+	maxCap =                         8345000000000000000000;
 	totalSupply =                50000000000000000000000000;
 	cap =                            1666000000000000000000;
 	
@@ -240,9 +243,10 @@ contract CREDToken is StandardToken, Ownable
     }
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-    event EarlyInvestorsBalanceReleased(address own, string message, uint256 TokensAdded);
     event TokenSaleIsNotAllowed(address sender, string message, uint256 amount);
     event OutOfTokens(address sender, string message, uint256 lastPurchase);
+    event WLTokensLimitReached(address sender, string message, uint256 lastPurchase);
+    event HardCapReached(address sender, string message, string message2);
     
     function buyCREDTokens(address beneficiary) public payable {
 	require(beneficiary != 0x0);
@@ -252,15 +256,15 @@ contract CREDToken is StandardToken, Ownable
         // calculate token amount to be created
         uint256 tokens = weiAmount.mul(rate);
 
+	if (weiRaised >= maxCap)
+	{
+		TokenSaleIsNotAllowed(msg.sender, "Refunded", msg.value);
+		HardCapReached(msg.sender, "HardCap", " Reached");
+		refundBack(msg.value);
+	}
+
 	if (now > tokensaleStartTime)
 	{
-	    if (earlyInvestorsBalance > 0)
-	    {
-		balances[verifyWallet] = balances[verifyWallet] + earlyInvestorsBalance;
-		EarlyInvestorsBalanceReleased(msg.sender, "Tokens Transferred to verifyWallet",  earlyInvestorsBalance);
-		earlyInvestorsBalance = 0;
-
-	    }
 
 	    if (tokens > balances[verifyWallet])
 	    {
@@ -280,15 +284,35 @@ contract CREDToken is StandardToken, Ownable
 	else 
 	    if ((now > earlyTokensaleStartTime) && isInWhiteList(msg.sender))
 	    {
-		if (tokens > earlyInvestorsBalance)
+
+		uint256 cIndex = customerInfo.addxIndex[msg.sender];
+		uint256 wlIndex = whitelistAddresses.addxIndex[msg.sender];
+		
+		int256 tokensLeft = (int256(whitelistAddresses.amount[wlIndex]) - int256(customerInfo.weiSpent[cIndex]))*int256(rate);
+		
+		if (tokensLeft < 0)
 		{
-		    OutOfTokens(msg.sender, "Early Investors Fund out of tokens", tokens);
-		    tokenDiff = tokens - earlyInvestorsBalance;
-		    tokens = earlyInvestorsBalance;
+		    refundBack(msg.value);
+		    return;
+		}
+		
+		tokenDiff = 0;
+		if (int256(tokens) > tokensLeft)
+		{
+		    tokenDiff = tokens - uint256(tokensLeft);
+		    tokens = uint256(tokensLeft);
 		}
 
-		balances[msg.sender] = balances[msg.sender] + tokens;
-		earlyInvestorsBalance -= tokens;
+		if (tokens > balances[verifyWallet])
+		{
+		    OutOfTokens(msg.sender, "VerifyWallet out of tokens", tokens);
+		    
+		    tokenDiff = tokens - balances[verifyWallet] + tokenDiff;
+		    
+		    tokens = balances[verifyWallet];
+		}
+
+		sellTokens(tokens);
 		TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 
 		forwardOrRefund(tokenDiff);
@@ -419,11 +443,12 @@ contract CREDToken is StandardToken, Ownable
     }
 
 
-    event AddressAddedToWhiteList(address sender, uint16 index, address addx);
-    function _AddAddressToWL(address addx) internal
+    event AddressAddedToWhiteList(address sender, uint256 index, address addx);
+    function _AddAddressToWL(address addx, uint256 amount) internal
     {
             whitelistAddresses.addxs[whitelistAddresses.size] = addx;
             whitelistAddresses.addxIndex[addx] = whitelistAddresses.size;
+            whitelistAddresses.amount[whitelistAddresses.size] = amount;
             AddressAddedToWhiteList(msg.sender, whitelistAddresses.size, addx);
             ++whitelistAddresses.size;
 	    _AddNewCustomer(addx, 0, 0);
@@ -451,8 +476,19 @@ contract CREDToken is StandardToken, Ownable
 
     function setAddressVerified(address addx) onlyOwner public
     {
-	uint256 cIndex = customerInfo.addxIndex[addx];
-	customerInfo.isVerified[cIndex] = true;
+	uint256 cIndex;
+	if (isInCustomerList(addx))
+	{
+	    cIndex = customerInfo.addxIndex[addx];
+	    customerInfo.isVerified[cIndex] = true;
+	}
+	else
+	{
+	    _AddNewCustomer(addx, 0, 0);
+	    cIndex = customerInfo.addxIndex[addx];
+	    customerInfo.isVerified[cIndex] = true;
+	    
+	}
     }
 
     function isAddressVerified(address addx) onlyOwner public returns(bool)
@@ -461,28 +497,34 @@ contract CREDToken is StandardToken, Ownable
 	return customerInfo.isVerified[cIndex];
 
     }
-    event AddTolist(address addx, string listname, uint16 index);
+    event AddTolist(address addx, string listname, uint256 index);
     event AddressAlreadyInList(address sender, string message, string listname);
-    function AddAdressesToWhitelist(address[] addxs) onlyOwner
+    event AddressArrayAndAmountArraysMustBeEqual(address sender, uint256 lengthAddresses, uint256 lengthAmounts);
+    function AddAdressesToWhitelist(address[] addxs, uint256[] amounts) onlyOwner
     {
-	for (uint16 i = 0; i < addxs.length; ++i)
+	if (amounts.length != addxs.length)
+	{
+	    AddressArrayAndAmountArraysMustBeEqual(msg.sender, addxs.length, amounts.length);
+	    return;
+	}
+	for (uint256 i = 0; i < addxs.length; ++i)
 	{
 	    AddTolist(addxs[i], "Whitelist", i);
 	    if (whitelistAddresses.size == 0)
 	    {
-		_AddAddressToWL(addxs[i]);
+		_AddAddressToWL(addxs[i], amounts[i]);
 	    }
     	    else {
     		if (whitelistAddresses.addxIndex[addxs[i]] == 0 && whitelistAddresses.addxs[0] != addxs[i])
     		{
-		    _AddAddressToWL(addxs[i]);
+		    _AddAddressToWL(addxs[i], amounts[i]);
     		}
     		else AddressAlreadyInList(msg.sender, "Address already in ", "Whitelist");
     	    }
 
 	}
     }
-
+/*
     function AddAdressesToAdvisorslist(address[] addxs) onlyOwner
     {
 	for (uint16 i = 0; i < addxs.length; ++i)
@@ -522,16 +564,16 @@ contract CREDToken is StandardToken, Ownable
 
 	}
     }
-
-    event ListWhitelist(address sender, uint16 index, address addx);
+*/
+    event ListWhitelist(address sender, uint256 index, address addx, uint256 amount);
     function ListWhitelistAddresses() onlyOwner public
     {
-	for (uint16 i = 0; i < whitelistAddresses.size; ++i)
+	for (uint256 i = 0; i < whitelistAddresses.size; ++i)
 	{
-	    ListWhitelist(msg.sender, i, whitelistAddresses.addxs[i]);
+	    ListWhitelist(msg.sender, i, whitelistAddresses.addxs[i], whitelistAddresses.amount[i]);
 	}
     }
-
+/*
     event ListAdvisors(address sender, uint16 index, address addx);
     function ListAdvisorsAddresses() onlyOwner
     {
@@ -549,7 +591,7 @@ contract CREDToken is StandardToken, Ownable
 	    ListWhitelist(msg.sender, i, teamAddresses.addxs[i]);
 	}
     }
-    
+*/    
     
     
     
