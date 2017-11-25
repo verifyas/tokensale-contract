@@ -74,7 +74,7 @@ contract CREDToken is StandardToken, Ownable
     uint256 public futureTokensaleTime;
     uint256 public verifyTeamLockTime;
     uint256 public advisorsLockTime1;
-    uint256 public advisorsLockTime2;
+//    uint256 public advisorsLockTime2;
     
     bool contractDeployed;
     bool capReached;
@@ -87,11 +87,6 @@ contract CREDToken is StandardToken, Ownable
 	    balances[futureTokenSaleWallet] = 0;
 	}
 
-	if (now > advisorsLockTime2)
-	{
-	    balances[verifyWallet] = balances[verifyWallet] + balances[advisorsWallet];
-	    balances[advisorsWallet] = 0;
-	}
     }
 
     function setEarlyTokenSaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
@@ -135,13 +130,6 @@ contract CREDToken is StandardToken, Ownable
 	}
     }
     
-    function setAdvisorsLockTime2(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
-    {
-	if (!contractDeployed)
-	{
-	    advisorsLockTime2 = dtUtils.toTimestamp(year, month, day, hour, minute);
-	}
-    }
 
     function setVerifyWallet(address vwAddress) onlyOwner public
     {
@@ -191,7 +179,7 @@ contract CREDToken is StandardToken, Ownable
 	}    
     }
     
-    function deployContract() public onlyOwner
+    function lockContract() public onlyOwner
     {
 	contractDeployed = true;
     }
@@ -240,12 +228,11 @@ contract CREDToken is StandardToken, Ownable
 	setFutureTokensaleTime(2018, 11, 29, 2, 0);
 	setVerifyTeamLockTime(2018, 11, 29, 2, 0);
 	setAdvisorsLockTime1(2018, 2, 29, 2, 0);
-	setAdvisorsLockTime2(2018, 11, 29, 2, 0);
 	contractDeployed = false;
     }
     
     function () payable {
-	buyCREDTokens(msg.sender);
+	if (msg.sender != verifyWallet) buyCREDTokens(msg.sender);
     }
 
     // @return true if the transaction can buy tokens
@@ -261,7 +248,7 @@ contract CREDToken is StandardToken, Ownable
     event HardCapReached(address sender, string message, string message2);
     event Debug(address sender, uint256 spent, uint256 amount, int256 left);
 
-    function buyCREDTokens(address beneficiary) public payable {
+    function buyCREDTokens(address beneficiary) internal {
 	require(beneficiary != 0x0);
 //	require(validPurchase());
 	uint256 tokenDiff = 0;
@@ -473,9 +460,9 @@ contract CREDToken is StandardToken, Ownable
 */
 
     event weiRefunded(address sender, address recipient, uint256 amount);
-    function refundForNotVerified(address Address) public
+    function refundForNotVerified(address Address) public onlyOwner
     {
-	if (msg.sender == verifyWallet)
+//	if (msg.sender == verifyWallet)
 	    if (!isAddressVerified(Address))
 	    {
 		uint256 cIndex = customerInfo.addxIndex[Address];
@@ -493,7 +480,7 @@ contract CREDToken is StandardToken, Ownable
     require(isAddressVerified(msg.sender));
     if ((msg.sender == verifyTeamWallet) && now < verifyTeamLockTime) return false;
     if ((msg.sender == advisorsWallet) && now < advisorsLockTime1) return false;
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
