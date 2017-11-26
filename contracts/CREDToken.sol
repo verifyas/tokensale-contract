@@ -222,10 +222,6 @@ contract CREDToken is StandardToken, Ownable
 	verifyTeamWallet = 0xC29789f465DF1AAF791027f4CABFc6Eb3EC2fc19;
 	advisorsWallet = 0x14589ba142Ff8686772D178A49503D176628147a;
 	
-	maxCap =                         8345000000000000000000;
-	totalSupply =                50000000000000000000000000;
-	cap =                            1666000000000000000000;
-	
 	InitializeToken();
 
 	setEarlyTokenSaleTime(2017, 11, 28, 2, 0);
@@ -266,6 +262,7 @@ contract CREDToken is StandardToken, Ownable
 		TokenSaleIsNotAllowed(msg.sender, "Refunded", msg.value);
 		HardCapReached(msg.sender, "HardCap", " Reached");
 		refundBack(msg.value);
+		return;
 	}
 
 	if (now > tokensaleStartTime)
