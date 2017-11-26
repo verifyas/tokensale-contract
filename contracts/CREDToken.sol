@@ -84,12 +84,13 @@ contract CREDToken is StandardToken, Ownable
     bool contractDeployed;
     bool capReached;
     
-    function releaseLocked() onlyOwner public
+    function startNextTokenSale(uint256 newHardCap) onlyOwner public
     {
 	if (now > futureTokensaleTime)
 	{
 	    balances[verifyWallet] = balances[verifyWallet] + balances[futureTokenSaleWallet];
 	    balances[futureTokenSaleWallet] = 0;
+	    maxCap = newHardCap;
 	}
 
     }
@@ -178,10 +179,10 @@ contract CREDToken is StandardToken, Ownable
 
     function setConversionRate(uint256 cRate) onlyOwner public
     {
-	if (!contractDeployed)
-	{
+//	if (!contractDeployed)
+//	{
 	    rate = cRate;
-	}    
+//	}    
     }
     
     function lockContract() public onlyOwner
