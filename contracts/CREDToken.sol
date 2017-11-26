@@ -7,8 +7,13 @@ import "./lib/DateTime.sol";
 
 contract CREDToken is StandardToken, Ownable
 {
-    using SafeMath for uint256;
 
+    string public constant name = "CRED";
+    string public constant symbol = "CRED";
+    uint8 public constant decimals = 18;
+
+    using SafeMath for uint256;
+    
     struct UniqueAddressSet
     {
 	mapping (address => uint256) addxIndex;
