@@ -56,7 +56,7 @@ contract CREDToken is StandardToken, Ownable
 
   function _UpdateCustomer(address addx, uint256 weiSpent, uint256 tokensPurchased) internal
   {
-    /* udpate details for a particular customer; can only contribute more, not less */
+    /* update details for a particular customer; can only contribute more, not less */
     uint256 cIndex = customerInfo.addxIndex[addx];
     customerInfo.weiSpent[cIndex] += weiSpent;
     customerInfo.tokensPurchased[cIndex] += tokensPurchased;
@@ -177,6 +177,7 @@ contract CREDToken is StandardToken, Ownable
 
   function setConversionRate(uint256 cRate) onlyOwner public
   {
+    // how many CRED tokens do you receive per ETH
     if (!contractDeployed)
     {
       rate = cRate;
@@ -229,11 +230,7 @@ contract CREDToken is StandardToken, Ownable
     verifyTeamWallet =          0xC29789f465DF1AAF791027f4CABFc6Eb3EC2fc19;
     advisorsWallet =            0x14589ba142Ff8686772D178A49503D176628147a;
 
-    maxCap =                         8345000000000000000000;
-    totalSupply =                50000000000000000000000000;
-    cap =                            1666000000000000000000;
-
-    InitializeToken(); /* TODO: won't this override the values set above? */
+    InitializeToken();
 
     setEarlyTokenSaleTime(2017, 11, 28, 2, 0); // UTC
     setTokensaleTime(2017, 11, 29, 2, 0);
@@ -278,6 +275,7 @@ contract CREDToken is StandardToken, Ownable
       TokenSaleIsNotAllowed(msg.sender, "Refunded", msg.value);
       HardCapReached(msg.sender, "HardCap", " Reached");
       refundBack(msg.value);
+      return;
     }
 
     if (now > tokensaleStartTime)
@@ -286,7 +284,7 @@ contract CREDToken is StandardToken, Ownable
       if (tokens > balances[verifyWallet])
       {
         // The verify wallet has no more tokens to distribute; hard cap reached
-        OutOfTokens(msg.sender, "VerifyWallet out of tokens", tokens); /* TODO: Isn't this hard-cap reached state too? */
+        OutOfTokens(msg.sender, "VerifyWallet out of tokens", tokens);
         tokenDiff = tokens - balances[verifyWallet];
         tokens = balances[verifyWallet];
       }
@@ -318,8 +316,8 @@ contract CREDToken is StandardToken, Ownable
 
         Debug(msg.sender, whitelistAddresses.amount[wlIndex], customerInfo.weiSpent[cIndex], tokensLeft);
 
-        /* TODO: BUG: Why is this check done *before* the current transaction amount is considered?
-            There should be no possible scenario where the wei spent is greater than the cap */
+        /* TODO: ASK: Why is this check done *before* the current transaction amount is considered?
+           There should be no possible scenario where the wei spent is greater than the cap */
         if (tokensLeft < 0)
         {
           refundBack(msg.value);
@@ -524,7 +522,7 @@ contract CREDToken is StandardToken, Ownable
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
-    Transfer(msg.sender, _to, _value); /* TODO: BUG Where is the Transfer event defined? */
+    Transfer(msg.sender, _to, _value);
     return true;
   }
 }
