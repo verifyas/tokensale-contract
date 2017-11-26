@@ -177,12 +177,17 @@ contract CREDToken is StandardToken, Ownable
 	}    
     }
 
+    function setMaxCap(uint256 newMaxCap) onlyOwner public
+    {
+	if (!contractDeployed)
+	{
+	    maxCap = newMaxCap;
+	}    
+    }
+
     function setConversionRate(uint256 cRate) onlyOwner public
     {
-//	if (!contractDeployed)
-//	{
 	    rate = cRate;
-//	}    
     }
     
     function lockContract() public onlyOwner
