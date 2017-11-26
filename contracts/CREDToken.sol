@@ -7,187 +7,188 @@ import "./lib/DateTime.sol";
 
 contract CREDToken is StandardToken, Ownable
 {
-    using SafeMath for uint256;
+  using SafeMath for uint256;
 
-    struct UniqueAddressSet
-    {
-	mapping (address => uint256) addxIndex;
-	mapping (uint256 => address) addxs;
-	uint256 size;
-	mapping (uint256 => uint256) amount;
-    }
+  // Storage unit for individual whitelisted address
+  struct UniqueAddressSet
+  {
+  	mapping (address => uint256) addxIndex; // get index for an address
+  	mapping (uint256 => address) addxs; // get address at index
+  	uint256 size;
+  	mapping (uint256 => uint256) amount; // get amount at index
+  }
+  UniqueAddressSet public whitelistAddresses;
 
-    UniqueAddressSet public whitelistAddresses;
+  // Storage unit for KYC'd addresses
+  struct KYCAddressSet
+  {
+	   mapping (address => uint256) addxIndex; // get customerInfo index from an address
+     mapping (uint256 => address) addxs; // get address from index
+     uint256 size; // tail pointer
+     mapping (uint256 => bool) isVerified; // is this address verified?
+	   mapping (uint256 => uint256) weiSpent; // tracks total wei spent by address
+     mapping (uint256 => uint256) tokensPurchased; // tracks token purchases
+     mapping (uint256 => uint256) lastPurchaseTimestamp;
+  }
+  KYCAddressSet customerInfo;
 
-    struct KYCAddressSet
-    {
-	mapping (address => uint256) addxIndex;
-	mapping (uint256 => address) addxs;
-	uint256 size;
-	mapping (uint256 => bool) isVerified;
-	mapping (uint256 => uint256) weiSpent;
-	mapping (uint256 => uint256) tokensPurchased;
-	mapping (uint256 => uint256) lastPurchaseTimestamp;
-    }
+  function isInCustomerList(address addx) internal returns (bool) /* TODO: Why no '_' prefix for this internal function? */
+  {
+    /* does this address belong to an existing customer? */
+    if (addx == customerInfo.addxs[0]) return true; /* TODO: Why this check? */
+	  else return (customerInfo.addxIndex[addx] != 0); // does entry exist?
+  }
 
-    KYCAddressSet customerInfo;
+  function _AddNewCustomer(address addx, uint256 weiSpent, uint256 tokensPurchased) internal
+  {
+    /* create new customerInfo object and append to list */
+    customerInfo.addxs[customerInfo.size] = addx;
+    customerInfo.weiSpent[customerInfo.size] = weiSpent;
+    customerInfo.tokensPurchased[customerInfo.size] = tokensPurchased;
+    customerInfo.lastPurchaseTimestamp[customerInfo.size] = now;
+    customerInfo.addxIndex[addx] = customerInfo.size;
+    ++customerInfo.size;
+  }
 
-    function isInCustomerList(address addx) internal returns (bool)
-    {
-	if (addx == customerInfo.addxs[0]) return true;
-	else return (customerInfo.addxIndex[addx] != 0);
-    }
-    
-    function _AddNewCustomer(address addx, uint256 weiSpent, uint256 tokensPurchased) internal
-    {
-            customerInfo.addxs[customerInfo.size] = addx;
-            customerInfo.weiSpent[customerInfo.size] = weiSpent;
-            customerInfo.tokensPurchased[customerInfo.size] = tokensPurchased;
-            customerInfo.lastPurchaseTimestamp[customerInfo.size] = now;
-            customerInfo.addxIndex[addx] = customerInfo.size;
-            ++customerInfo.size;
-    }
+  function _UpdateCustomer(address addx, uint256 weiSpent, uint256 tokensPurchased) internal
+  {
+    /* udpate details for a particular customer; can only contribute more, not less */
+	  uint256 cIndex = customerInfo.addxIndex[addx];
+    customerInfo.weiSpent[cIndex] += weiSpent;
+    customerInfo.tokensPurchased[cIndex] += tokensPurchased;
+    customerInfo.lastPurchaseTimestamp[cIndex] = now;
+  }
 
-    function _UpdateCustomer(address addx, uint256 weiSpent, uint256 tokensPurchased) internal
-    {
-	uint256 cIndex = customerInfo.addxIndex[addx];
-	customerInfo.weiSpent[cIndex] += weiSpent;
-        customerInfo.tokensPurchased[cIndex] += tokensPurchased;
-        customerInfo.lastPurchaseTimestamp[cIndex] = now;
-        
-    }
+  uint256 public rate;
+  uint256 public cap;
+  uint256 public maxCap;
+  address public verifyWallet;
+  address public verifyFundWallet;
+  address public miscellaneousWallet;
+  address public futureTokenSaleWallet;
+  address public verifyTeamWallet;
+  address public advisorsWallet;
+  uint256 public weiRaised;
+  DateTime public dtUtils;
 
-    uint256 public rate;
-    uint256 public cap;
-    uint256 public maxCap;
-    address public verifyWallet;
-    address public verifyFundWallet;
-    address public miscellaneousWallet;
-    address public futureTokenSaleWallet;
-    address public verifyTeamWallet;
-    address public advisorsWallet;
-    uint256 public weiRaised;
-    DateTime public dtUtils;
-    
-    uint256 public earlyTokensaleStartTime;
-    uint256 public tokensaleStartTime;
-    uint256 public futureTokensaleTime;
-    uint256 public verifyTeamLockTime;
-    uint256 public advisorsLockTime1;
-//    uint256 public advisorsLockTime2;
-    
-    bool contractDeployed;
-    bool capReached;
-    
-    function releaseLocked() onlyOwner public
-    {
-	if (now > futureTokensaleTime)
-	{
-	    balances[verifyWallet] = balances[verifyWallet] + balances[futureTokenSaleWallet];
-	    balances[futureTokenSaleWallet] = 0;
-	}
+  uint256 public earlyTokensaleStartTime;
+  uint256 public tokensaleStartTime;
+  uint256 public futureTokensaleTime;
+  uint256 public verifyTeamLockTime;
+  uint256 public advisorsLockTime1;
 
-    }
+  bool contractDeployed;
+  bool capReached;
 
-    function setEarlyTokenSaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
-    {
-	if (!contractDeployed)
-	{
-	    earlyTokensaleStartTime = dtUtils.toTimestamp(year, month, day, hour, minute);
-	}
-    }
-    
-    function setTokensaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
-    {
-	if (!contractDeployed)
-	{
-	    tokensaleStartTime = dtUtils.toTimestamp(year, month, day, hour, minute);
-	}
-    }
+  function releaseLocked() onlyOwner public
+  {
+    /* releases tokens that are locked for future tokensale, after lock period has lapsed  */
+  	if (now > futureTokensaleTime)
+  	{
+  	  balances[verifyWallet] = balances[verifyWallet] + balances[futureTokenSaleWallet];
+      balances[futureTokenSaleWallet] = 0;
+  	}
+  }
 
-    function setFutureTokensaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
-    {
-	if (!contractDeployed)
-	{
+  /* you can either deploy using the below setters or using deployToProduction() below */
+  function setEarlyTokenSaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+  {
+  	if (!contractDeployed)
+  	{
+  	  earlyTokensaleStartTime = dtUtils.toTimestamp(year, month, day, hour, minute);
+  	}
+  }
+
+  function setTokensaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+  {
+	   if (!contractDeployed)
+	   {
+	     tokensaleStartTime = dtUtils.toTimestamp(year, month, day, hour, minute);
+	   }
+  }
+
+  function setFutureTokensaleTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+  {
+	  if (!contractDeployed)
+	  {
 	    futureTokensaleTime = dtUtils.toTimestamp(year, month, day, hour, minute);
-	}
-    }
+	  }
+  }
 
-    
-    function setVerifyTeamLockTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
-    {
-	if (!contractDeployed)
-	{
+  function setVerifyTeamLockTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+  {
+	  if (!contractDeployed)
+	  {
 	    verifyTeamLockTime = dtUtils.toTimestamp(year, month, day, hour, minute);
-	}
-    }
-    
-    function setAdvisorsLockTime1(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
-    {
-	if (!contractDeployed)
-	{
+	  }
+  }
+
+  function setAdvisorsLockTime1(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+  { /* TODO: Change to setAdvisorsLockTime (remove '1') */
+	  if (!contractDeployed)
+	  {
 	    advisorsLockTime1 = dtUtils.toTimestamp(year, month, day, hour, minute);
-	}
-    }
-    
+	  }
+  }
 
-    function setVerifyWallet(address vwAddress) onlyOwner public
-    {
-	if (!contractDeployed)
-	{
-	    verifyWallet = vwAddress;
-	}    
-    }
+  function setVerifyWallet(address vwAddress) onlyOwner public
+  {
+  	if (!contractDeployed)
+  	{
+  	  verifyWallet = vwAddress;
+  	}
+  }
 
-    function setVerifyFundWallet(address vwfAddress) onlyOwner public
-    {
-	if (!contractDeployed)
-	{
-	    verifyFundWallet = vwfAddress;
-	}    
-    }
+  function setVerifyFundWallet(address vwfAddress) onlyOwner public
+  {
+  	if (!contractDeployed)
+  	{
+  	  verifyFundWallet = vwfAddress;
+  	}
+  }
 
-    function setVerifyTeamWallet(address Address) onlyOwner public
-    {
-	if (!contractDeployed)
-	{
-	    verifyTeamWallet = Address;
-	}    
-    }
+  function setVerifyTeamWallet(address Address) onlyOwner public
+  {
+  	if (!contractDeployed)
+  	{
+  	  verifyTeamWallet = Address;
+  	}
+  }
 
-    function setVerifyAdvisorsWallet(address Address) onlyOwner public
-    {
-	if (!contractDeployed)
-	{
-	    advisorsWallet = Address;
-	}    
-    }
+  function setVerifyAdvisorsWallet(address Address) onlyOwner public
+  {
+  	if (!contractDeployed)
+  	{
+  	  advisorsWallet = Address;
+  	}
+  }
 
-    function setVerifyMiscWallet(address Address) onlyOwner public
-    {
-	if (!contractDeployed)
-	{
-	    miscellaneousWallet = Address;
-	}    
-    }
+  function setVerifyMiscWallet(address Address) onlyOwner public
+  {
+  	if (!contractDeployed)
+  	{
+  	  miscellaneousWallet = Address;
+  	}
+  }
 
-    function setConversionRate(uint256 cRate) onlyOwner public
-    {
-	if (!contractDeployed)
-	{
-	    rate = cRate;
-	}    
-    }
-    
-    function lockContract() public onlyOwner
-    {
-	contractDeployed = true;
-    }
+  function setConversionRate(uint256 cRate) onlyOwner public
+  {
+  	if (!contractDeployed)
+  	{
+  	  rate = cRate;
+  	}
+  }
 
-    function CREDToken()
-    {
-	dtUtils = new DateTime();
-    }
+  function lockContract() public onlyOwner
+  {
+	  contractDeployed = true;
+  }
+
+  function CREDToken()
+  {
+    /* constructor */
+	  dtUtils = new DateTime();
+  }
 
     function InitializeToken() public onlyOwner
     {
@@ -196,7 +197,7 @@ contract CREDToken is StandardToken, Ownable
 	maxCap =                         	    8345000000000000000000;
 	totalSupply =                		50000000000000000000000000;
 	cap =                            	    1666000000000000000000;
-	
+
 	balances[verifyFundWallet] = 		10500000000000000000000000;
 	balances[verifyWallet] =     		11125000000000000000000000;
 
@@ -216,11 +217,11 @@ contract CREDToken is StandardToken, Ownable
 	futureTokenSaleWallet =     0xb30CC06c46A0Ad3Ba600f4a66FB68F135EAb716D;
 	verifyTeamWallet = 0xC29789f465DF1AAF791027f4CABFc6Eb3EC2fc19;
 	advisorsWallet = 0x14589ba142Ff8686772D178A49503D176628147a;
-	
+
 	maxCap =                         8345000000000000000000;
 	totalSupply =                50000000000000000000000000;
 	cap =                            1666000000000000000000;
-	
+
 	InitializeToken();
 
 	setEarlyTokenSaleTime(2017, 11, 28, 2, 0);
@@ -230,7 +231,7 @@ contract CREDToken is StandardToken, Ownable
 	setAdvisorsLockTime1(2018, 2, 29, 2, 0);
 	contractDeployed = false;
     }
-    
+
     function () payable {
 	if (msg.sender != verifyWallet) buyCREDTokens(msg.sender);
     }
@@ -280,7 +281,7 @@ contract CREDToken is StandardToken, Ownable
 	    if (isInCustomerList(msg.sender)) _UpdateCustomer (msg.sender, weiResult, tokens);
 	    else _AddNewCustomer (msg.sender, weiResult, tokens);
 	}
-	else 
+	else
 	    if ((now > earlyTokensaleStartTime) && isInWhiteList(msg.sender))
 	    {
 
@@ -316,9 +317,9 @@ contract CREDToken is StandardToken, Ownable
 		TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 
         	//customerInfo.weiSpent[cIndex] = customerInfo.weiSpent[cIndex] + forwardOrRefund(tokenDiff);
-		
+
 		uint256 weiDiff = forwardOrRefund(tokenDiff);
-		
+
 		if (isInCustomerList(msg.sender)) _UpdateCustomer (msg.sender, weiDiff, tokens);
 		else _AddNewCustomer (msg.sender, weiDiff, tokens);
 
@@ -346,7 +347,7 @@ contract CREDToken is StandardToken, Ownable
             weiRaised = weiRaised.add(weiDiff);
             return weiDiff;
     }
-    
+
     function isInWhiteList(address addx) internal returns (bool)
     {
 	if (addx == whitelistAddresses.addxs[0]) return true;
@@ -394,7 +395,7 @@ contract CREDToken is StandardToken, Ownable
 	    _AddNewCustomer(addx, 0, 0);
 	    cIndex = customerInfo.addxIndex[addx];
 	    customerInfo.isVerified[cIndex] = true;
-	    
+
 	}
     }
 
@@ -440,7 +441,7 @@ contract CREDToken is StandardToken, Ownable
 	    ListWhitelist(msg.sender, i, whitelistAddresses.addxs[i], whitelistAddresses.amount[i]);
 	}
     }
-    
+
 /* Rufund function.
     event weiRefunded(address sender, address recipient, uint256 amount);
     function refundCapNotReached() public
@@ -470,7 +471,7 @@ contract CREDToken is StandardToken, Ownable
 		Address.transfer(amount);
 		balances[verifyWallet] += balances[Address];
 		balances[Address] = 0;
-	    
+
 		weiRefunded(msg.sender, Address, amount);
 	    }
     }
