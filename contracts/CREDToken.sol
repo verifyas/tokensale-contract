@@ -65,7 +65,6 @@ contract CREDToken is StandardToken, Ownable
   }
 
   uint256 public rate;
-  uint256 public cap;
   uint256 public maxCap;
   address public verifyWallet;
   address public verifyFundWallet;
@@ -84,7 +83,6 @@ contract CREDToken is StandardToken, Ownable
   uint256 public advisorsLockTime1;
 
   bool contractDeployed;
-  bool capReached; /* TODO: remove, not in use */
   bool hardCapReached;
 
   function startNextTokenSale(uint256 newHardCap) onlyOwner public
@@ -213,7 +211,6 @@ contract CREDToken is StandardToken, Ownable
     contractDeployed = false;
     weiRaised = 0;
 
-    cap =               1666000000000000000000; // soft cap: 1,666 ETH
     maxCap =            8345000000000000000000; // hard cap: 8,345 ETH
     totalSupply =   50000000000000000000000000; // 50,000,000 CREDs
 
