@@ -40,7 +40,7 @@ contract CREDToken is StandardToken, Ownable
   function _isInCustomerList(address addx) internal returns (bool)
   {
     /* does this address belong to an existing customer? */
-    if (addx == customerInfo.addxs[0]) return true; /* TODO: Why this check? */
+    if (addx == customerInfo.addxs[0]) return true;
     else return (customerInfo.addxIndex[addx] != 0); // does entry exist?
   }
 
@@ -135,7 +135,7 @@ contract CREDToken is StandardToken, Ownable
   }
 
   function setAdvisorsLockTime1(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
-  { /* TODO: Change to setAdvisorsLockTime (remove '1') */
+  {
     if (!contractDeployed)
     {
       advisorsLockTime1 = dtUtils.toTimestamp(year, month, day, hour, minute);
@@ -324,13 +324,6 @@ contract CREDToken is StandardToken, Ownable
         /* it would be +ve if there was some room left for buying tokens  */
 
         Debug(msg.sender, whitelistAddresses.amount[wlIndex], customerInfo.weiSpent[cIndex], tokensLeft);
-
-        /* TODO: Remove dead code below: There is no possible scenario where the wei spent is greater than the cap */
-        if (tokensLeft < 0)
-        {
-          refundBack(msg.value);
-          return;
-        }
 
         tokenDiff = 0;
         if (int256(tokens) > tokensLeft)
