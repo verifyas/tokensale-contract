@@ -37,7 +37,7 @@ contract CREDToken is StandardToken, Ownable
   KYCAddressSet customerInfo;
   mapping (address => bool) public isVerified;
 
-  function isInCustomerList(address addx) internal returns (bool) /* TODO: Why no '_' prefix for this internal function? */
+  function _isInCustomerList(address addx) internal returns (bool)
   {
     /* does this address belong to an existing customer? */
     if (addx == customerInfo.addxs[0]) return true; /* TODO: Why this check? */
@@ -310,7 +310,7 @@ contract CREDToken is StandardToken, Ownable
       uint256 weiResult = forwardOrRefund(tokenDiff);
 
       // Update customerInfo
-      if (isInCustomerList(msg.sender)) _UpdateCustomer(msg.sender, weiResult, tokens);
+      if (_isInCustomerList(msg.sender)) _UpdateCustomer(msg.sender, weiResult, tokens);
       else _AddNewCustomer(msg.sender, weiResult, tokens);
     }
     else
@@ -365,7 +365,7 @@ contract CREDToken is StandardToken, Ownable
         uint256 weiDiff = forwardOrRefund(tokenDiff); /* TODO: Come back to this after inspecting forwardOrRefund */
 
         // weiDiff holds the actual contribution amount (original - refunded amount)
-        if (isInCustomerList(msg.sender)) _UpdateCustomer (msg.sender, weiDiff, tokens);
+        if (_isInCustomerList(msg.sender)) _UpdateCustomer (msg.sender, weiDiff, tokens);
         else _AddNewCustomer (msg.sender, weiDiff, tokens);
       }
       else
@@ -442,7 +442,7 @@ contract CREDToken is StandardToken, Ownable
   function setAddressVerified(address addx) onlyOwner public
   {
     uint256 cIndex;
-    if (isInCustomerList(addx))
+    if (_isInCustomerList(addx))
     {
       cIndex = customerInfo.addxIndex[addx];
       customerInfo.isVerified[cIndex] = true;
