@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 
 import "./math/SafeMath.sol";
 import "./token/StandardToken.sol";
@@ -35,6 +35,7 @@ contract CREDToken is StandardToken, Ownable
      mapping (uint256 => uint256) lastPurchaseTimestamp;
   }
   KYCAddressSet customerInfo;
+  mapping (address => bool) public isVerified;
 
   function isInCustomerList(address addx) internal returns (bool) /* TODO: Why no '_' prefix for this internal function? */
   {
@@ -77,21 +78,29 @@ contract CREDToken is StandardToken, Ownable
 
   uint256 public earlyTokensaleStartTime;
   uint256 public tokensaleStartTime;
+  uint256 public tokensaleEndTime;
   uint256 public futureTokensaleTime;
   uint256 public verifyTeamLockTime;
   uint256 public advisorsLockTime1;
 
   bool contractDeployed;
-  bool capReached;
+  bool capReached; /* TODO: remove, not in use */
+  bool hardCapReached;
 
-  function releaseLocked() onlyOwner public
+  function startNextTokenSale(uint256 newHardCap) onlyOwner public
   {
     /* releases tokens that are locked for future tokensale, after lock period has lapsed  */
     if (now > futureTokensaleTime)
     {
       balances[verifyWallet] = balances[verifyWallet] + balances[futureTokenSaleWallet];
       balances[futureTokenSaleWallet] = 0;
+      maxCap = newHardCap;
     }
+  }
+
+  function setTokensaleEndTime(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public onlyOwner
+  {
+    tokensaleEndTime = dtUtils.toTimestamp(year, month, day, hour, minute);
   }
 
   /* you can either deploy using the below setters or using deployToProduction() below */
@@ -175,13 +184,15 @@ contract CREDToken is StandardToken, Ownable
     }
   }
 
+  funtion setMaxCap(uint256 newMaxCap) onlyOwner public
+  {
+    maxCap = newMaxCap;
+  }
+
   function setConversionRate(uint256 cRate) onlyOwner public
   {
     // how many CRED tokens do you receive per ETH
-    if (!contractDeployed)
-    {
-      rate = cRate;
-    }
+    rate = cRate;
   }
 
   function lockContract() public onlyOwner
@@ -193,6 +204,7 @@ contract CREDToken is StandardToken, Ownable
   {
     /* constructor */
     dtUtils = new DateTime();
+    hardCapReached = false;
   }
 
   function InitializeToken() public onlyOwner
@@ -234,6 +246,7 @@ contract CREDToken is StandardToken, Ownable
 
     setEarlyTokenSaleTime(2017, 11, 28, 2, 0); // UTC
     setTokensaleTime(2017, 11, 29, 2, 0);
+    setTokensaleEndTime(2017, 12, 29, 2, 0);
     setFutureTokensaleTime(2018, 11, 29, 2, 0); // at least 12 months out
     setVerifyTeamLockTime(2018, 11, 29, 2, 0); // at least 12 months out
     setAdvisorsLockTime1(2018, 2, 28, 2, 0); // 3 month cliff
@@ -433,12 +446,14 @@ contract CREDToken is StandardToken, Ownable
     {
       cIndex = customerInfo.addxIndex[addx];
       customerInfo.isVerified[cIndex] = true;
+      isVerified[addx] = true;
     }
     else
     {
       _AddNewCustomer(addx, 0, 0);
       cIndex = customerInfo.addxIndex[addx];
       customerInfo.isVerified[cIndex] = true;
+      isVerified[addx] = true;
     }
   }
 
@@ -514,10 +529,13 @@ contract CREDToken is StandardToken, Ownable
     // verified (i.e. passed KYC)
 
     require(_to != address(0)); // prevent accidental burning of tokens
-    require(isAddressVerified(msg.sender)); // only allow verified senders
 
+    // handle transfer locks on verify wallets
     if ((msg.sender == verifyTeamWallet) && now < verifyTeamLockTime) return false;
     if ((msg.sender == advisorsWallet) && now < advisorsLockTime1) return false;
+
+    // lock tokens till end of sale OR until hard cap is reached
+    if ((now < tokensaleEndTime) || (!hardCapReached)) return false;
 
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
