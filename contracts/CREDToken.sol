@@ -182,8 +182,9 @@ contract CREDToken is StandardToken, Ownable
     }
   }
 
-  funtion setMaxCap(uint256 newMaxCap) onlyOwner public
+  function setMaxCap(uint256 newMaxCap) onlyOwner public
   {
+    // what is the hard cap, in wei
     maxCap = newMaxCap;
   }
 
@@ -207,11 +208,10 @@ contract CREDToken is StandardToken, Ownable
 
   function InitializeToken() public onlyOwner
   {
-    /* TODO: These caps need to be set 24 hours before the tokensale date */
     contractDeployed = false;
     weiRaised = 0;
 
-    maxCap =            8345000000000000000000; // hard cap: 8,345 ETH
+    maxCap =            5144000000000000000000; // hard cap: 5,144 ETH
     totalSupply =   50000000000000000000000000; // 50,000,000 CREDs
 
     /* CRED allocations, made according to white paper */
@@ -230,7 +230,7 @@ contract CREDToken is StandardToken, Ownable
      * sets default values for the contract and deploys the contract (as an
      * alternative to setting manually using setters)
      **/
-    rate = 1333; // default CREDs/ETH rate
+    rate = 2162; // default CREDs/ETH rate
     weiRaised = 0;
     verifyWallet =              0xB4e817449b2fcDEc82e69f02454B42FE95D4d1fD;
     verifyFundWallet =          0x028e27D09bb37FA00a1691fFE935D190C8D1668c;
@@ -253,7 +253,6 @@ contract CREDToken is StandardToken, Ownable
   function () payable {
     /* allows someone to buy CRED tokens */
     if (msg.sender != verifyWallet) buyCREDTokens(msg.sender);
-    /* TODO: Question, what about 'else' */
   }
 
   // @return true if the transaction can buy tokens
@@ -326,8 +325,7 @@ contract CREDToken is StandardToken, Ownable
 
         Debug(msg.sender, whitelistAddresses.amount[wlIndex], customerInfo.weiSpent[cIndex], tokensLeft);
 
-        /* TODO: ASK: Why is this check done *before* the current transaction amount is considered?
-           There should be no possible scenario where the wei spent is greater than the cap */
+        /* TODO: Remove dead code below: There is no possible scenario where the wei spent is greater than the cap */
         if (tokensLeft < 0)
         {
           refundBack(msg.value);
@@ -359,7 +357,7 @@ contract CREDToken is StandardToken, Ownable
 
         //customerInfo.weiSpent[cIndex] = customerInfo.weiSpent[cIndex] + forwardOrRefund(tokenDiff);
 
-        uint256 weiDiff = forwardOrRefund(tokenDiff); /* TODO: Come back to this after inspecting forwardOrRefund */
+        uint256 weiDiff = forwardOrRefund(tokenDiff);
 
         // weiDiff holds the actual contribution amount (original - refunded amount)
         if (_isInCustomerList(msg.sender)) _UpdateCustomer (msg.sender, weiDiff, tokens);
@@ -388,7 +386,7 @@ contract CREDToken is StandardToken, Ownable
 
     // forward the funds on to the tokensale wallet
     weiDiff = msg.value - weiRefund;
-    forwardFunds(weiDiff); /* TODO: Come back after reviewing forwardFunds */
+    forwardFunds(weiDiff);
 
     // update state
     weiRaised = weiRaised.add(weiDiff);
