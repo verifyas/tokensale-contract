@@ -41,5 +41,5 @@ The tokensale consists of a pre-sale as well as a public sale. The pre-sale begi
 - Hard cap: 5,000 ETH (if the hard cap is reached, the tokensale ends immediately)
 - Rate (from CRED -> ETH) can be found using the formula:
   - tokensale allocation / hard cap = 11,125,000 / 5000 = 2,225 CRED / ETH
-- The hard cap in ETH will be set just before the tokensale starts, so please update the rate calculation automatically after it is set
+- The hard cap in ETH will be set just before the tokensale starts, so the rate calculation will be updated automatically after it is set
 - Tokens will be frozen until 1 week after the tokensale is completed
