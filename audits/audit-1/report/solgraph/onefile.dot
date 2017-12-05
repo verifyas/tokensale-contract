@@ -1,0 +1,124 @@
+strict digraph {
+  mul [color=gray]
+  assert
+  div [color=gray]
+  sub [color=gray]
+  add [color=gray]
+  Ownable
+  transferOwnership
+  require
+  OwnershipTransferred
+  pause
+  Pause
+  unpause
+  Unpause
+  balanceOf
+  transfer
+  allowance
+  transferFrom
+  approve
+  safeTransfer [color=gray]
+  safeTransferFrom [color=gray]
+  safeApprove [color=gray]
+  TokenVesting
+  release
+  Released
+  revoke
+  Revoked
+  releasableAmount
+  vestedAmount
+  Transfer
+  Approval
+  increaseApproval
+  decreaseApproval
+  mint
+  Mint
+  finishMinting
+  MintFinished
+  CappedToken
+  CREDToken
+  mintAdvisorsTokens
+  MintLocked
+  mintTeamTokens
+  mintReserveTokens
+  finalise
+  unfreeze
+  unlockTeamAndReserveTokens
+  unlockAdvisorTokens
+  Crowdsale
+  createTokenContract [color=gray]
+  null
+  buyTokens
+  TokenPurchase
+  forwardFunds [color=gray]
+  validPurchase [color=gray]
+  hasEnded
+  CappedCrowdsale
+  Tokensale
+  mintInvestmentFundAndMiscellaneous [color=gray]
+  setHardCap
+  addPresaleWallets
+  castedToken [color=gray]
+  validSalePurchase [color=gray]
+  validPreSalePurchase [color=gray]
+  mul -> assert
+  sub -> assert
+  add -> assert
+  transferOwnership -> require
+  transferOwnership -> OwnershipTransferred
+  pause -> Pause
+  unpause -> Unpause
+  safeTransfer -> assert
+  safeTransferFrom -> assert
+  safeApprove -> assert
+  TokenVesting -> require
+  release -> require
+  release -> safeTransfer
+  release -> Released
+  revoke -> require
+  revoke -> safeTransfer
+  revoke -> Revoked
+  transfer -> require
+  transfer -> Transfer
+  transferFrom -> require
+  transferFrom -> Transfer
+  approve -> Approval
+  increaseApproval -> Approval
+  decreaseApproval -> Approval
+  mint -> Mint
+  mint -> Transfer
+  finishMinting -> MintFinished
+  CappedToken -> require
+  mint -> require
+  mintAdvisorsTokens -> require
+  mintAdvisorsTokens -> MintLocked
+  mintTeamTokens -> require
+  mintTeamTokens -> MintLocked
+  mintReserveTokens -> require
+  mintReserveTokens -> MintLocked
+  finalise -> require
+  finalise -> finishMinting
+  unfreeze -> require
+  unlockAdvisorTokens -> require
+  unlockAdvisorTokens -> release
+  Crowdsale -> require
+  null -> buyTokens
+  buyTokens -> require
+  buyTokens -> mint
+  buyTokens -> TokenPurchase
+  buyTokens -> forwardFunds
+  forwardFunds -> transfer
+  CappedCrowdsale -> require
+  Tokensale -> require
+  Tokensale -> mintInvestmentFundAndMiscellaneous
+  Tokensale -> mintTeamTokens
+  Tokensale -> mintReserveTokens
+  Tokensale -> mintAdvisorsTokens
+  setHardCap -> require
+  addPresaleWallets -> require
+  buyTokens -> buyTokens
+  finalise -> finalise
+  mintInvestmentFundAndMiscellaneous -> mint
+  validPurchase -> require
+}
+

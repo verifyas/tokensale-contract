@@ -1,0 +1,31 @@
+strict digraph {
+  CREDToken
+  mintAdvisorsTokens
+  require
+  MintLocked
+  mintTeamTokens
+  mintReserveTokens
+  finalise
+  finishMinting
+  unfreeze
+  unlockTeamAndReserveTokens
+  unlockAdvisorTokens
+  release
+  transfer
+  transferFrom
+  approve
+  increaseApproval
+  decreaseApproval
+  mintAdvisorsTokens -> require
+  mintAdvisorsTokens -> MintLocked
+  mintTeamTokens -> require
+  mintTeamTokens -> MintLocked
+  mintReserveTokens -> require
+  mintReserveTokens -> MintLocked
+  finalise -> require
+  finalise -> finishMinting
+  unfreeze -> require
+  unlockAdvisorTokens -> require
+  unlockAdvisorTokens -> release
+}
+

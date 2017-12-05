@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+    <head>
+        <title>ESLint Report</title>
+        <style>
+            body {
+                font-family:Arial, "Helvetica Neue", Helvetica, sans-serif;
+                font-size:16px;
+                font-weight:normal;
+                margin:0;
+                padding:0;
+                color:#333
+            }
+            #overview {
+                padding:20px 30px
+            }
+            td, th {
+                padding:5px 10px
+            }
+            h1 {
+                margin:0
+            }
+            table {
+                margin:30px;
+                width:calc(100% - 60px);
+                max-width:1000px;
+                border-radius:5px;
+                border:1px solid #ddd;
+                border-spacing:0px;
+            }
+            th {
+                font-weight:400;
+                font-size:normal;
+                text-align:left;
+                cursor:pointer
+            }
+            td.clr-1, td.clr-2, th span {
+                font-weight:700
+            }
+            th span {
+                float:right;
+                margin-left:20px
+            }
+            th span:after {
+                content:"";
+                clear:both;
+                display:block
+            }
+            tr:last-child td {
+                border-bottom:none
+            }
+            tr td:first-child, tr td:last-child {
+                color:#9da0a4
+            }
+            #overview.bg-0, tr.bg-0 th {
+                color:#468847;
+                background:#dff0d8;
+                border-bottom:1px solid #d6e9c6
+            }
+            #overview.bg-1, tr.bg-1 th {
+                color:#f0ad4e;
+                background:#fcf8e3;
+                border-bottom:1px solid #fbeed5
+            }
+            #overview.bg-2, tr.bg-2 th {
+                color:#b94a48;
+                background:#f2dede;
+                border-bottom:1px solid #eed3d7
+            }
+            td {
+                border-bottom:1px solid #ddd
+            }
+            td.clr-1 {
+                color:#f0ad4e
+            }
+            td.clr-2 {
+                color:#b94a48
+            }
+            td a {
+                color:#3a33d1;
+                text-decoration:none
+            }
+            td a:hover {
+                color:#272296;
+                text-decoration:underline
+            }
+        </style>
+    </head>
+    <body>
+        <div id="overview" class="bg-2">
+            <h1>ESLint Report</h1>
+            <div>
+                <span>37 problems (19 errors, 18 warnings)</span> - Generated on Mon Dec 04 2017 17:20:51 GMT+0300 (+03)
+            </div>
+        </div>
+        <table>
+            <tbody>
+                <tr class="bg-2" data-group="f-0">
+    <th colspan="4">
+        [+] contracts/CREDToken.sol
+        <span>23 problems (13 errors, 10 warnings)</span>
+    </th>
+</tr>
+<tr style="display:none" class="f-0">
+    <td>1:17</td>
+    <td class="clr-3">Error</td>
+    <td>Compiler version must be fixed</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/compiler-fixed" target="_blank">compiler-fixed</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>4:8</td>
+    <td class="clr-2">Error</td>
+    <td>Use double quotes for string literals</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/quotes" target="_blank">quotes</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>5:8</td>
+    <td class="clr-2">Error</td>
+    <td>Use double quotes for string literals</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/quotes" target="_blank">quotes</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>6:8</td>
+    <td class="clr-2">Error</td>
+    <td>Use double quotes for string literals</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/quotes" target="_blank">quotes</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>16:28</td>
+    <td class="clr-2">Error</td>
+    <td>Constant name must be in capitalized SNAKE_CASE</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/const-name-snakecase" target="_blank">const-name-snakecase</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>17:27</td>
+    <td class="clr-2">Error</td>
+    <td>Constant name must be in capitalized SNAKE_CASE</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/const-name-snakecase" target="_blank">const-name-snakecase</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>18:28</td>
+    <td class="clr-2">Error</td>
+    <td>Constant name must be in capitalized SNAKE_CASE</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/const-name-snakecase" target="_blank">const-name-snakecase</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>35:5</td>
+    <td class="clr-3">Error</td>
+    <td>Explicitly mark visibility of state</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/state-visibility" target="_blank">state-visibility</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>36:5</td>
+    <td class="clr-3">Error</td>
+    <td>Explicitly mark visibility of state</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/state-visibility" target="_blank">state-visibility</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>37:5</td>
+    <td class="clr-3">Error</td>
+    <td>Explicitly mark visibility of state</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/state-visibility" target="_blank">state-visibility</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>60:5</td>
+    <td class="clr-2">Error</td>
+    <td>Definitions inside contract / library must be separated by one line</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/separate-by-one-line-in-contract" target="_blank">separate-by-one-line-in-contract</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>71:17</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>90:5</td>
+    <td class="clr-2">Error</td>
+    <td>Visibility modifier must be first in list of modifiers</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/visibility-modifier-order" target="_blank">visibility-modifier-order</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>125:5</td>
+    <td class="clr-2">Error</td>
+    <td>Definitions inside contract / library must be separated by one line</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/separate-by-one-line-in-contract" target="_blank">separate-by-one-line-in-contract</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>131:60</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>133:24</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>138:5</td>
+    <td class="clr-2">Error</td>
+    <td>Definitions inside contract / library must be separated by one line</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/separate-by-one-line-in-contract" target="_blank">separate-by-one-line-in-contract</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>140:17</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>146:5</td>
+    <td class="clr-2">Error</td>
+    <td>Definitions inside contract / library must be separated by one line</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/separate-by-one-line-in-contract" target="_blank">separate-by-one-line-in-contract</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>146:108</td>
+    <td class="clr-2">Error</td>
+    <td>Open bracket must be indented by other constructions by space</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/bracket-align" target="_blank">bracket-align</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>155:17</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>157:33</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-0">
+    <td>165:5</td>
+    <td class="clr-2">Error</td>
+    <td>Definitions inside contract / library must be separated by one line</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/separate-by-one-line-in-contract" target="_blank">separate-by-one-line-in-contract</a>
+    </td>
+</tr>
+
+<tr class="bg-2" data-group="f-1">
+    <th colspan="4">
+        [+] contracts/Tokensale.sol
+        <span>14 problems (6 errors, 8 warnings)</span>
+    </th>
+</tr>
+<tr style="display:none" class="f-1">
+    <td>1:17</td>
+    <td class="clr-3">Error</td>
+    <td>Compiler version must be fixed</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/compiler-fixed" target="_blank">compiler-fixed</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>4:8</td>
+    <td class="clr-2">Error</td>
+    <td>Use double quotes for string literals</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/quotes" target="_blank">quotes</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>5:8</td>
+    <td class="clr-2">Error</td>
+    <td>Use double quotes for string literals</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/quotes" target="_blank">quotes</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>6:8</td>
+    <td class="clr-2">Error</td>
+    <td>Use double quotes for string literals</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/quotes" target="_blank">quotes</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>7:8</td>
+    <td class="clr-2">Error</td>
+    <td>Use double quotes for string literals</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/quotes" target="_blank">quotes</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>10:48</td>
+    <td class="clr-2">Error</td>
+    <td>Open bracket must be on same line. It must be indented by other constructions by space</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/bracket-align" target="_blank">bracket-align</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>33:17</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>38:17</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>53:5</td>
+    <td class="clr-2">Error</td>
+    <td>Visibility modifier must be first in list of modifiers</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/visibility-modifier-order" target="_blank">visibility-modifier-order</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>74:17</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>81:17</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>92:13</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>128:13</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+<tr style="display:none" class="f-1">
+    <td>129:13</td>
+    <td class="clr-3">Error</td>
+    <td>Avoid to make time-based decisions in your business logic</td>
+    <td>
+        <a href="http://eslint.org/docs/rules/not-rely-on-time" target="_blank">not-rely-on-time</a>
+    </td>
+</tr>
+
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            var groups = document.querySelectorAll("tr[data-group]");
+            for (i = 0; i < groups.length; i++) {
+                groups[i].addEventListener("click", function() {
+                    var inGroup = document.getElementsByClassName(this.getAttribute("data-group"));
+                    this.innerHTML = (this.innerHTML.indexOf("+") > -1) ? this.innerHTML.replace("+", "-") : this.innerHTML.replace("-", "+");
+                    for (var j = 0; j < inGroup.length; j++) {
+                        inGroup[j].style.display = (inGroup[j].style.display !== "none") ? "none" : "table-row";
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>
+

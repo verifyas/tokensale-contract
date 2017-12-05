@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+      .container { padding: 15px auto }
+
+      @media (min-width: 768px) {
+        .container {
+          width: 750px;
+        }
+      }
+      @media (min-width: 992px) {
+        .container {
+          width: 970px;
+        }
+      }
+      @media (min-width: 1200px) {
+        .container {
+          width: 1170px;
+        }
+      }
+
+      .warning-box {
+        background-color: white;
+        border: .2em dotted red;
+        line-height: 20px;
+        padding: 8px 15px;
+        border-radius: 5px;
+        margin-bottom: 1em
+      }
+      .safe-box {
+        background-color: white;
+        border: .2em dotted green;
+        line-height: 20px;
+        padding: 8px 15px;
+        border-radius: 5px;
+        margin-bottom: 1em
+      }
+      .col1_1 {
+        width: 25%;
+        min-width: 235px;
+        float: left;
+        align-self: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1 style="text-align: center">Oyente analysis result</h1>
+<div>
+    <div style='font-weight: bold'>browser/Untitled.sol</div>
+      <div class="warning-box">
+        <div style="text-align: center">browser/Untitled.sol:StandardToken</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>99.9%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: red">True</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+          <br />
+          <div>Details</div>
+                <div><pre>browser/Untitled.sol:27:5: Warning: Assertion Failure.
+    assert(c &gt;= a)
+Assertion violates when:
+    _value = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    balances[_to] = 31011907737879846905537130462912155126960895589245379915617170833225066774705
+    allowed[_from][msg.sender] = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    balances[_from] = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    _to = 1461501637330902918203684832716283019655932542975</pre></div>
+      </div>
+      <div class="safe-box">
+        <div style="text-align: center">browser/Untitled.sol:SafeMath</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>100.0%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+      </div>
+      <div class="warning-box">
+        <div style="text-align: center">browser/Untitled.sol:CREDToken</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>68.0%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: red">True</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+          <br />
+          <div>Details</div>
+                <div><pre>browser/Untitled.sol:27:5: Warning: Assertion Failure.
+    assert(c &gt;= a)
+Assertion violates when:
+    _value = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    balances[_to] = 31011907737879846905537130462912155126960895589245379915617170833225066774705
+    allowed[_from][msg.sender] = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    balances[_from] = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    _to = 1461501637330902918203684832716283019655932542975
+    locked = 0</pre></div>
+      </div>
+      <div class="warning-box">
+        <div style="text-align: center">browser/Untitled.sol:TokenVesting</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>90.6%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: red">True</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+          <br />
+          <div>Details</div>
+                <div><pre>browser/Untitled.sol:21:5: Warning: Assertion Failure.
+    assert(b &lt;= a)
+Assertion violates when:
+    start = 1
+    revoked[token] = 0
+    duration = 115792089237316195423570985008687907853269984665640564039457584007913129639934
+    cliff = 0
+    released[token] = 0</pre></div>
+                <div><pre>browser/Untitled.sol:27:5: Warning: Assertion Failure.
+    assert(c &gt;= a)
+Assertion violates when:
+    start = 1
+    duration = 115792089237316195423570985008687907853269984665640564039457584007913129639935
+    cliff = 0
+    released[token] = 0</pre></div>
+      </div>
+      <div class="warning-box">
+        <div style="text-align: center">browser/Untitled.sol:MintableToken</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>99.9%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: red">True</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+          <br />
+          <div>Details</div>
+                <div><pre>browser/Untitled.sol:27:5: Warning: Assertion Failure.
+    assert(c &gt;= a)
+Assertion violates when:
+    _value = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    balances[_to] = 31011907737879846905537130462912155126960895589245379915617170833225066774705
+    allowed[_from][msg.sender] = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    balances[_from] = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    _to = 1461501637330902918203684832716283019655932542975</pre></div>
+      </div>
+      <div class="safe-box">
+        <div style="text-align: center">browser/Untitled.sol:Pausable</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>99.8%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+      </div>
+      <div class="safe-box">
+        <div style="text-align: center">browser/Untitled.sol:Ownable</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>99.5%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+      </div>
+      <div class="warning-box">
+        <div style="text-align: center">browser/Untitled.sol:CappedToken</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>99.6%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: red">True</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+          <br />
+          <div>Details</div>
+                <div><pre>browser/Untitled.sol:27:5: Warning: Assertion Failure.
+    assert(c &gt;= a)
+Assertion violates when:
+    _value = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    balances[_to] = 31011907737879846905537130462912155126960895589245379915617170833225066774705
+    allowed[_from][msg.sender] = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    balances[_from] = 88964353373763045885795690415161928411490039952130836214028735836176136306767
+    _to = 1461501637330902918203684832716283019655932542975</pre></div>
+      </div>
+      <div class="warning-box">
+        <div style="text-align: center">browser/Untitled.sol:Tokensale</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>68.4%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: red">True</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: red">True</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+          <br />
+          <div>Details</div>
+                <div><pre>browser/Untitled.sol:27:5: Warning: Assertion Failure.
+    assert(c &gt;= a)
+Assertion violates when:
+    weiRaised = 1
+    paused = 0</pre></div>
+                <div><pre>browser/Untitled.sol:677:12: Warning: Timestamp Dependency.
+    return withinPeriod &amp;&amp; nonZeroPurchase</pre></div>
+                <div><pre>browser/Untitled.sol:702:12: Warning: Timestamp Dependency.
+    return super.validPurchase() &amp;&amp; withinCap</pre></div>
+                <div><pre>browser/Untitled.sol:840:16: Warning: Timestamp Dependency.
+        return validSalePurchase() || validPreSalePurchase()</pre></div>
+                <div><pre>browser/Untitled.sol:833:9: Warning: Timestamp Dependency.
+        if (now &gt;= startTime) { return false; }</pre></div>
+                <div><pre>browser/Untitled.sol:832:9: Warning: Timestamp Dependency.
+        if (now &lt; presaleStartTime) { return false; }</pre></div>
+                <div><pre>browser/Untitled.sol:675:25: Warning: Timestamp Dependency.
+    bool withinPeriod = now &gt;= startTime &amp;&amp; now &lt;= endTime</pre></div>
+      </div>
+      <div class="safe-box">
+        <div style="text-align: center">browser/Untitled.sol:SafeERC20</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>100.0%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+      </div>
+      <div class="warning-box">
+        <div style="text-align: center">browser/Untitled.sol:BasicToken</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>99.5%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: red">True</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+          <br />
+          <div>Details</div>
+                <div><pre>browser/Untitled.sol:27:5: Warning: Assertion Failure.
+    assert(c &gt;= a)
+Assertion violates when:
+    balances[_to] = 66856184261385214108408597654402785422430169472278770250914080072048199204049
+    _value = 57938452453005874615280298637860938028508748633530783054289495821861177524225
+    balances[msg.sender] = 57938452453005874615280298637860938028508748633530783054289495821861177524225
+    _to = 1461501637330902918203684832716283019655932542975</pre></div>
+      </div>
+      <div class="safe-box">
+        <div style="text-align: center">browser/Untitled.sol:Crowdsale</div>
+        <div>
+          <div class="col1_1">EVM Code Coverage</div>
+          <div>16.1%</div>
+        </div>
+          <div>
+            <div class="col1_1">Callstack Depth Attack Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Re-Entrancy Vulnerability:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Assertion Failure:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Timestamp Dependency:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">:</div>
+              <div style="color: green">False</div>
+          </div>
+          <div>
+            <div class="col1_1">Transaction-Ordering Dependence (TOD):</div>
+              <div style="color: green">False</div>
+          </div>
+      </div>
+</div>
+
+
+    </div>
+  </body>
+</html>

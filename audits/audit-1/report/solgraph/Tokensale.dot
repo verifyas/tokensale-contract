@@ -1,0 +1,31 @@
+strict digraph {
+  Tokensale
+  require
+  mintInvestmentFundAndMiscellaneous [color=gray]
+  mintTeamTokens
+  mintReserveTokens
+  mintAdvisorsTokens
+  setHardCap
+  addPresaleWallets
+  buyTokens
+  finalise
+  mint
+  castedToken [color=gray]
+  createTokenContract [color=gray]
+  validSalePurchase [color=gray]
+  validPreSalePurchase [color=gray]
+  validPurchase [color=gray]
+  Tokensale -> require
+  Tokensale -> mintInvestmentFundAndMiscellaneous
+  Tokensale -> mintTeamTokens
+  Tokensale -> mintReserveTokens
+  Tokensale -> mintAdvisorsTokens
+  setHardCap -> require
+  addPresaleWallets -> require
+  buyTokens -> buyTokens
+  finalise -> require
+  finalise -> finalise
+  mintInvestmentFundAndMiscellaneous -> mint
+  validPurchase -> require
+}
+
