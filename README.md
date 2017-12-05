@@ -30,7 +30,7 @@ The ETH raised from the tokensale will be stored in an external wallet, with an 
 
 ### Tokensale Details
 
-The tokensale consists of a pre-sale as well as a public sale. The pre-sale begins 1 day before the public sale, and is available only to specific ETH addresses up to a specific ETH contribution limit. We will provide you with a list of this data -- there will be about 500 addresses (and amounts) in total.
+The tokensale consists of a pre-sale as well as a public sale. The pre-sale begins 1 day before the public sale, and is available only to specific ETH addresses up to a specific ETH contribution limit -- there is a list of about 500 addresses (and amounts) in total.
 
 #### Tokensale attributes:
 
