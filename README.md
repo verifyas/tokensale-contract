@@ -35,9 +35,9 @@ The tokensale consists of a pre-sale as well as a public sale. The pre-sale begi
 #### Tokensale attributes:
 
 - Tokens available for sale: 11,125,000 CRED tokens
-- Presale start Date: Dec 4, 2017 at 2pm UTC
-- Public Start Date: Dec 5, 2017 at 2pm UTC
-- End Date: Jan 5, 2018 (30 days later)
+- Presale start Date: Dec 6, 2017 at 2pm UTC
+- Public Start Date: Dec 7, 2017 at 2pm UTC
+- End Date: Jan 7, 2018 (30 days later)
 - Hard cap: 5,000 ETH (if the hard cap is reached, the tokensale ends immediately)
 - Rate (from CRED -> ETH) can be found using the formula:
   - tokensale allocation / hard cap = 11,125,000 / 5000 = 2,225 CRED / ETH
