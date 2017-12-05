@@ -1,6 +1,7 @@
-# CREDD Smart Contract Audit
+# CRED Smart Contract Audit
+-- Published [here](https://github.com/DeRain/cred-token-ico-audit)
 
-#### [Smart Contract](https://github.com/ibininja/smartcont/)
+#### [Smart Contract](https://github.com/verifyas/contract)
 
 [1. Build log](./audit/1_build_log.md)  
 [2. Migration log](./audit/2_migration_log.md)  
