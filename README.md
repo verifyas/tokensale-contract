@@ -2,7 +2,16 @@
 
 **Important Note**: The primary audit report will be added shortly.
 
-## Requirements
+## Contracts
+
+The contracts are primarily composed of two main files:
+
+- [Tokensale.sol](contracts/Tokensale.sol): Main tokensale contract, deploys the CRED token
+- [CREDToken.sol](contracts/CREDToken.sol): The main CRED token contract
+
+The Tokensale contract receives ETH contributions during the tokensale and forwards them to the Verify wallet. It also deploys the main CRED token contract, mints the various tokens (along with their locks) and implements the whitelist functionality for the pre-sale. Once the tokensale is done, the CREDtoken contract is finalized and the owner is set to `0x0` to prevent further changes.
+
+## Description
 
 The below requirements describe the behavior that this smart contract adheres to.
 
