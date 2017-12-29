@@ -28,7 +28,7 @@ The 50,000,000 CRED tokens will be allocated according to the below table:
 | Tokens | Purpose | Lockup Period |
 |-------:|:--------|:--------------|
 | 11,125,000 | Tokensale | After end of tokensale by 1 week |
-| 10,5000,000 | Verify Fund (single wallet) | Until end of tokensale |
+| 10,500,000 | Verify Fund (single wallet) | Until end of tokensale |
 | 2,875,000 | Miscellaneous (bounty, early investors) | Until end of tokensale |
 | 10,000,000 | Verify Team (single wallet) |  Until 1 year after start of tokensale |
 | 10,000,000 | Reserved for future tokensale (single wallet) | Until 1 year after start of tokensale |
